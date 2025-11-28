@@ -1,0 +1,359 @@
+// Prisma Schema for Enterprise Dashboard with RBAC
+// This schema defines User, Role, Permission, Menu, and AuditLog models
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model - stores all user information
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  username      String    @unique
+  password      String? // Nullable for social login users
+  firstName     String?
+  lastName      String?
+  avatar        String?
+  isActive      Boolean   @default(true)
+  isEmailVerified Boolean @default(false)
+  provider      String    @default("credentials") // credentials, google, whatsapp
+  providerId    String? // OAuth provider ID
+  lastLogin     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  roles         UserRole[]
+  auditLogs     AuditLog[]
+  blogs         Blog[]
+  media        Media[]
+  donors        Donor[]
+
+  @@index([email])
+  @@index([username])
+  @@index([isActive])
+  @@map("users")
+}
+
+// Role model - defines different roles in the system
+model Role {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique // superadmin, admin, manager, user, etc.
+  description String?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  users       UserRole[]
+  permissions RolePermission[]
+  menus       RoleMenu[]
+
+  @@index([slug])
+  @@index([isActive])
+  @@map("roles")
+}
+
+// Permission model - defines granular permissions
+model Permission {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique // e.g., user.create, user.read, user.update, user.delete
+  description String?
+  resource    String    // e.g., user, role, permission, menu
+  action      String    // e.g., create, read, update, delete, manage
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  roles       RolePermission[]
+
+  @@index([slug])
+  @@index([resource, action])
+  @@index([isActive])
+  @@map("permissions")
+}
+
+
+
+// Menu model - defines navigation menu items
+model Menu {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  path        String?   // Route path
+  icon        String?
+  parentId    String?   // For nested menus
+  order       Int       @default(0)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  isPublic Boolean @default(false)
+
+  // Relations
+  parent      Menu?     @relation("MenuHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children    Menu[]    @relation("MenuHierarchy")
+  roles       RoleMenu[]
+ 
+  @@index([slug])
+  @@index([parentId])
+  @@index([isActive])
+  @@index([isPublic]) 
+  @@map("menus")
+}
+
+// Junction table: User <-> Role (Many-to-Many)
+model UserRole {
+  id        String   @id @default(cuid())
+  userId    String
+  roleId    String
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+  @@index([userId])
+  @@index([roleId])
+  @@map("user_roles")
+}
+
+// Junction table: Role <-> Permission (Many-to-Many)
+model RolePermission {
+  id           String   @id @default(cuid())
+  roleId       String
+  permissionId String
+  createdAt    DateTime @default(now())
+
+  // Relations
+  role         Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+  @@map("role_permissions")
+}
+
+// Junction table: Role <-> Menu (Many-to-Many)
+model RoleMenu {
+  id        String   @id @default(cuid())
+  roleId    String
+  menuId    String
+  createdAt DateTime @default(now())
+
+  // Relations
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  menu      Menu     @relation(fields: [menuId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, menuId])
+  @@index([roleId])
+  @@index([menuId])
+  @@map("role_menus")
+}
+
+// AuditLog model - tracks all user actions for compliance and security
+model AuditLog {
+  id          String   @id @default(cuid())
+  userId      String
+  action      String   // e.g., CREATE_USER, UPDATE_ROLE, DELETE_PERMISSION
+  resource    String   // e.g., User, Role, Permission
+  resourceId  String?  // ID of the affected resource
+  description String?  // Human-readable description
+  metadata    String?  // JSON string for additional data
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  // Relations
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([action])
+  @@index([resource])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+
+
+// Blog model - user-specific blog posts
+model Blog {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  content     String   // Rich text content
+  excerpt     String?  // Short description
+  coverImage  String?  // Cover image URL
+  isPublished Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  views       Int      @default(0)
+  authorId    String   // User who created the blog
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  publishedAt DateTime?
+
+  // Relations
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([authorId])
+  @@index([slug])
+  @@index([isPublished])
+  @@index([isActive])
+  @@index([createdAt])
+  @@map("blogs")
+}
+
+
+
+
+
+// Media model - Local storage media files
+model Media {
+  id          String   @id @default(cuid())
+  name        String
+  url         String   // Relative URL (e.g., /storage/media/filename.jpg)
+  publicId    String   // Unique filename identifier
+  format      String   // jpg, png, webp, gif, svg
+  resourceType String  // image, video, raw
+  bytes       Int?     // File size in bytes
+  width       Int?     // Image width
+  height      Int?     // Image height
+  duration    Int?     // Video duration in seconds (if applicable)
+  folder      String?  // Storage folder path
+  tags        String[] // Tags for organization
+  uploadedBy  String   // User who uploaded
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  uploader    User     @relation(fields: [uploadedBy], references: [id], onDelete: Cascade)
+
+  @@index([uploadedBy])
+  @@index([resourceType])
+  @@index([folder])
+  @@index([createdAt])
+  @@map("media")
+}
+
+
+
+// Visit tracking model - Track daily visits by IP
+model Visit {
+  id          String   @id @default(cuid())
+  ipAddress   String
+  userAgent   String?
+  referer     String?
+  path        String   // Page path visited
+  country     String?
+  city        String?
+  device      String?  // mobile, desktop, tablet
+  browser     String?
+  os          String?
+  visitedAt   DateTime @default(now())
+
+  @@index([ipAddress])
+  @@index([path])
+  @@index([visitedAt])
+  @@map("visits")
+}
+
+
+
+// Donor model - comprehensive donor information
+model Donor {
+  id                         String        @id @default(cuid())
+  donorId                    String        @unique
+  
+  // Personal Information
+  firstName                  String
+  lastName                   String
+  fullName                   String
+  dateOfBirth                DateTime
+  gender                     Gender
+  bloodGroup                 BloodGroup
+  weight                     Int
+  height                     Int
+  mobileNumber               String        @unique
+  email                      String?       @unique
+  permanentAddress           String
+  city                       String
+  state                      String
+  pincode                    String
+  emergencyContactName       String?
+  emergencyContactNumber     String?
+  
+  // Medical Information
+  takingMedication           Boolean       @default(false)
+  medicationDetails          String?
+  chronicIllness             Boolean       @default(false)
+  illnessDetails             String?
+  donatedBefore              Boolean       @default(false)
+  lastDonationDate           DateTime?
+  surgeryInLast6Months       Boolean       @default(false)
+  surgeryDetails             String?
+  smokeOrAlcohol             Boolean       @default(false)
+  eligibleForDonation        Boolean       @default(false)
+  medicalNotes               String?
+  
+  // Preferences
+  willingToBeRegularDonor    Boolean       @default(false)
+  notificationPreference     NotificationPreference[]
+  
+  // Status
+  status                     DonorStatus   @default(active)
+  
+
+  createdBy                  String?
+  user                       User?         @relation(fields: [createdBy], references: [id], onDelete: SetNull)
+  
+  createdAt                  DateTime      @default(now())
+  updatedAt                  DateTime      @updatedAt
+
+  @@index([mobileNumber])
+  @@index([email])
+  @@index([bloodGroup])
+  @@index([status])
+  @@index([createdAt])
+  @@map("donors")
+}
+
+// Enums
+enum Gender {
+  male
+  female
+  other
+}
+
+enum BloodGroup {
+  A_POS
+  A_NEG
+  B_POS
+  B_NEG
+  AB_POS
+  AB_NEG
+  O_POS
+  O_NEG
+}
+
+enum DonorStatus {
+  active
+  inactive
+  blocked
+  suspended
+}
+
+
+enum NotificationPreference {
+  SMS
+  EMAIL
+  PUSH
+}
