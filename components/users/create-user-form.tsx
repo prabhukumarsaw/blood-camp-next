@@ -235,7 +235,7 @@ export function CreateUserForm({ roles }: CreateUserFormProps) {
             </div>
           )}
 
-          <div className="flex gap-4">
+          <div className="flex gap-4 justify-end">
             <Button type="submit" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Create User

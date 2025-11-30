@@ -46,7 +46,7 @@ export default async function OverViewLayout({
           </h2>
         </div>
 
-        <div className='*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs md:grid-cols-2 lg:grid-cols-4'>
+        <div className='*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs md:grid-cols-2'>
           {/* Card 1: Today's Unique Visits */}
           <Card className='@container/card'>
             <CardHeader>
@@ -67,37 +67,12 @@ export default async function OverViewLayout({
                 {stats.visitChange >= 0 ? <IconTrendingUp className='size-4' /> : <IconTrendingDown className='size-4' />}
               </div>
               <div className='text-muted-foreground'>
-                {stats.todayNewsViews} news views today
+                Unique visitors today
               </div>
             </CardFooter>
           </Card>
 
-          {/* Card 2: Total News Posts */}
-          <Card className='@container/card'>
-            <CardHeader>
-              <CardDescription>Total News Posts</CardDescription>
-              <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
-                {formatNumber(stats.totalNews)}
-              </CardTitle>
-              <CardAction>
-                <Badge variant='outline'>
-                  {stats.publishedChange >= 50 ? <IconTrendingUp /> : <IconTrendingDown />}
-                  {stats.publishedChange.toFixed(1)}% published
-                </Badge>
-              </CardAction>
-            </CardHeader>
-            <CardFooter className='flex-col items-start gap-1.5 text-sm'>
-              <div className='line-clamp-1 flex gap-2 font-medium'>
-                {stats.publishedNews} published posts
-                {stats.publishedChange >= 50 ? <IconTrendingUp className='size-4' /> : <IconTrendingDown className='size-4' />}
-              </div>
-              <div className='text-muted-foreground'>
-                {stats.totalNews - stats.publishedNews} drafts
-              </div>
-            </CardFooter>
-          </Card>
-
-          {/* Card 3: Total Users & Roles */}
+          {/* Card 2: Total Users & Roles */}
           <Card className='@container/card'>
             <CardHeader>
               <CardDescription>Users & Roles</CardDescription>
@@ -117,31 +92,6 @@ export default async function OverViewLayout({
               </div>
               <div className='text-muted-foreground'>
                 {stats.totalRoles} role{stats.totalRoles !== 1 ? 's' : ''} configured
-              </div>
-            </CardFooter>
-          </Card>
-
-          {/* Card 4: Active Advertisements */}
-          <Card className='@container/card'>
-            <CardHeader>
-              <CardDescription>Active Advertisements</CardDescription>
-              <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
-                {formatNumber(stats.activeAds)}
-              </CardTitle>
-              <CardAction>
-                <Badge variant='outline'>
-                  {stats.activeAds > 0 ? <IconTrendingUp /> : <IconTrendingDown />}
-                  Active now
-                </Badge>
-              </CardAction>
-            </CardHeader>
-            <CardFooter className='flex-col items-start gap-1.5 text-sm'>
-              <div className='line-clamp-1 flex gap-2 font-medium'>
-                {stats.activeAds > 0 ? 'Ads running' : 'No active ads'} 
-                {stats.activeAds > 0 ? <IconTrendingUp className='size-4' /> : <IconTrendingDown className='size-4' />}
-              </div>
-              <div className='text-muted-foreground'>
-                Currently displayed on site
               </div>
             </CardFooter>
           </Card>

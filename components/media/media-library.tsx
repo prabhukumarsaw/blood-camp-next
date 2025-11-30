@@ -101,7 +101,7 @@ export function MediaLibrary({ media, total, page, totalPages, search: initialSe
   }
 
   // Stats
-  const totalSize = media.reduce((acc:any, m:any) => acc + (m.bytes || 0), 0)
+  const totalSize = media.reduce((acc: any, m: any) => acc + (m.bytes || 0), 0)
   // const imageCount = media.filter(m => m.resourceType === "image").length
 
   if (error) {
@@ -118,48 +118,38 @@ export function MediaLibrary({ media, total, page, totalPages, search: initialSe
 
   return (
     <div className="flex flex-col min-h-screen w-full">
-      {/* Header */}
-      <div className="border-b bg-gradient-to-r from-background to-muted/30 w-full">
-        <div className="p-6 md:p-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
-                Media Library
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                Manage, upload and organize your media assets
-              </p>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="hidden md:flex items-center gap-4 text-sm text-muted-foreground">
-                <div className="flex items-center gap-1.5">
-                  <HardDrive className="h-4 w-4" />
-                  <span>{formatBytes(totalSize)}</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <ImageIcon className="h-4 w-4" />
-                  <span>{total} files</span>
-                </div>
+
+
+      {/* Main Content */}
+      <Tabs defaultValue="library" className="flex-1">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border rounded-full p-2 px-6">
+          <div className="">
+            <TabsList className="h-12 bg-transparent p-0 gap-4">
+              <TabsTrigger value="library" className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-full px-3">
+                <FolderOpen className="h-4 w-4 mr-2" />
+                Library
+              </TabsTrigger>
+              <TabsTrigger value="upload" className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-full px-3">
+                <Upload className="h-4 w-4 mr-2" />
+                Upload
+              </TabsTrigger>
+            </TabsList>
+          </div>
+
+          <div className="flex items-center gap-3 border rounded-full p-3">
+            <div className="hidden md:flex items-center gap-4 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1.5">
+                <HardDrive className="h-4 w-4" />
+                <span>{formatBytes(totalSize)}</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <ImageIcon className="h-4 w-4" />
+                <span>{total} files</span>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <Tabs defaultValue="library" className="flex-1">
-        <div className="border-b px-6 md:px-8">
-          <TabsList className="h-12 bg-transparent p-0 gap-4">
-            <TabsTrigger value="library" className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-1 pb-3">
-              <FolderOpen className="h-4 w-4 mr-2" />
-              Library
-            </TabsTrigger>
-            <TabsTrigger value="upload" className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-1 pb-3">
-              <Upload className="h-4 w-4 mr-2" />
-              Upload
-            </TabsTrigger>
-          </TabsList>
-        </div>
 
         <TabsContent value="library" className="mt-0 flex-1">
           <div className="p-6 md:p-8 space-y-6">
@@ -215,7 +205,7 @@ export function MediaLibrary({ media, total, page, totalPages, search: initialSe
               </Card>
             ) : viewMode === "grid" ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                {media.map((item:any) => (
+                {media.map((item: any) => (
                   <div
                     key={item.id}
                     className="group relative bg-card border rounded-xl overflow-hidden hover:shadow-lg hover:border-primary/50 transition-all duration-200 cursor-pointer"
@@ -223,11 +213,11 @@ export function MediaLibrary({ media, total, page, totalPages, search: initialSe
                   >
                     <div className="aspect-square relative bg-background w-full">
                       {item.resourceType === "image" ? (
-                        <OptimizedImage 
-                          src={item.url} 
-                          alt={item.name} 
-                          fill 
-                          className="object-cover" 
+                        <OptimizedImage
+                          src={item.url}
+                          alt={item.name}
+                          fill
+                          className="object-cover"
                           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 16vw"
                         />
                       ) : (
@@ -261,7 +251,7 @@ export function MediaLibrary({ media, total, page, totalPages, search: initialSe
             ) : (
               <Card>
                 <div className="divide-y">
-                  {media.map((item:any) => (
+                  {media.map((item: any) => (
                     <div key={item.id} className="flex items-center gap-4 p-4 hover:bg-muted/50 transition-colors group">
                       <div className="relative w-16 h-16 rounded-lg overflow-hidden bg-background shrink-0">
                         {item.resourceType === "image" ? (
@@ -312,7 +302,7 @@ export function MediaLibrary({ media, total, page, totalPages, search: initialSe
 
       {/* Detail Dialog */}
       <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
-        <DialogContent className="max-w-4xl p-0 gap-0 overflow-hidden">
+        <DialogContent className="md:max-w-4xl max-w-full p-0 gap-0 overflow-hidden">
           <DialogHeader className="sr-only">
             <DialogTitle>Media Details</DialogTitle>
           </DialogHeader>
@@ -331,7 +321,7 @@ export function MediaLibrary({ media, total, page, totalPages, search: initialSe
                     <h3 className="font-semibold truncate max-w-[200px]">{selectedMedia.name}</h3>
                     <p className="text-sm text-muted-foreground">{formatDate(selectedMedia.createdAt)}</p>
                   </div>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => setDetailOpen(false)}><X className="h-4 w-4" /></Button>
+                  {/* <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => setDetailOpen(false)}><X className="h-4 w-4" /></Button> */}
                 </div>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div><p className="text-muted-foreground">Format</p><Badge variant="secondary" className="mt-1 uppercase">{selectedMedia.format}</Badge></div>

@@ -16,7 +16,7 @@ import PageContainer from "@/components/layout/page-container";
 export default async function UsersPage({
   searchParams,
 }: {
-  searchParams: { page?: string; search?: string };
+  searchParams: Promise<{ page?: string; search?: string }>;
 }) {
   const user = await getCurrentUser();
   if (!user) {
@@ -27,10 +27,10 @@ export default async function UsersPage({
   const hasAccess = await checkPermission("user.read");
   if (!hasAccess) {
     redirect("/dashboard");
-  }
+  } 
 
-  const page = parseInt(searchParams.page || "1");
-  const search = searchParams.search;
+  const { page: pageParam, search } = await searchParams;
+  const page = pageParam ? Math.max(1, parseInt(pageParam, 10) || 1) : 1;
   const limit = 10;
 
   const result: any = await getUsers(page, limit, search);

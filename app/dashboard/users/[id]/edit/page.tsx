@@ -4,6 +4,7 @@ import { getUserById, updateUser } from "@/lib/actions/users";
 import { getRoles } from "@/lib/actions/roles";
 import { redirect, notFound } from "next/navigation";
 import { EditUserForm } from "@/components/users/edit-user-form";
+import PageContainer from "@/components/layout/page-container";
 
 /**
  * Edit User Page
@@ -12,7 +13,7 @@ import { EditUserForm } from "@/components/users/edit-user-form";
 export default async function EditUserPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const user = await getCurrentUser();
   if (!user) {
@@ -24,8 +25,9 @@ export default async function EditUserPage({
     redirect("/dashboard/users");
   }
 
+  const { id } = await params;
   const [userResult, rolesResult] = await Promise.all([
-    getUserById(params.id),
+    getUserById(id),
     getRoles(),
   ]);
 
@@ -36,7 +38,8 @@ export default async function EditUserPage({
   const roles: any = rolesResult.success ? rolesResult.roles : [];
 
   return (
-    <div className="space-y-6">
+    <PageContainer>
+      <div className='flex flex-1 flex-col space-y-2'>
       <div>
         <h1 className="text-3xl font-bold">Edit User</h1>
         <p className="text-muted-foreground mt-2">
@@ -46,6 +49,7 @@ export default async function EditUserPage({
 
       <EditUserForm user={userResult.user} roles={roles} />
     </div>
+    </PageContainer>
   );
 }
 

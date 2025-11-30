@@ -33,6 +33,9 @@ model User {
   blogs         Blog[]
   media        Media[]
   donors        Donor[]
+  bloodReports  BloodReport[]
+  notificationTemplates NotificationTemplate[]
+  gatewayConfigs GatewayConfig[]
 
   @@index([email])
   @@index([username])
@@ -284,6 +287,7 @@ model Donor {
   height                     Int
   mobileNumber               String        @unique
   email                      String?       @unique
+  aadharNumber               String?       @unique
   permanentAddress           String
   city                       String
   state                      String
@@ -318,12 +322,54 @@ model Donor {
   createdAt                  DateTime      @default(now())
   updatedAt                  DateTime      @updatedAt
 
+  // Relations
+  bloodReports               BloodReport[]
+
   @@index([mobileNumber])
   @@index([email])
+  @@index([aadharNumber])
   @@index([bloodGroup])
   @@index([status])
   @@index([createdAt])
   @@map("donors")
+}
+
+// Blood Report model - stores blood test reports for donors
+model BloodReport {
+  id                String    @id @default(cuid())
+  donorId           String
+  donor             Donor     @relation(fields: [donorId], references: [id], onDelete: Cascade)
+  
+  // File Information
+  fileName          String
+  originalFileName  String
+  fileUrl           String    // Relative URL to PDF file
+  fileSize          Int       // Size in bytes
+  mimeType          String    @default("application/pdf")
+  
+  // Report Metadata
+  reportDate        DateTime? // Date when the test was conducted
+  testType          String?   // Type of blood test (e.g., "Complete Blood Count", "Lipid Profile")
+  notes             String?   // Additional notes about the report
+  
+  // Status
+  isActive          Boolean   @default(true)
+  isNotified        Boolean   @default(false) // Whether donor has been notified
+  notifiedAt        DateTime?
+  
+  // Upload Information
+  uploadedBy        String
+  user              User      @relation(fields: [uploadedBy], references: [id], onDelete: Cascade)
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([donorId])
+  @@index([uploadedBy])
+  @@index([reportDate])
+  @@index([createdAt])
+  @@index([isActive])
+  @@map("blood_reports")
 }
 
 // Enums
@@ -356,4 +402,89 @@ enum NotificationPreference {
   SMS
   EMAIL
   PUSH
+}
+
+// Notification Template model
+model NotificationTemplate {
+  id                String    @id @default(cuid())
+  name              String
+  type              NotificationType
+  category          NotificationCategory
+  subject           String?   // For email
+  content           String    // Template content with variables
+  variables         String[]  // Available variables: {name}, {link}, etc.
+  isActive          Boolean   @default(true)
+  usageCount        Int       @default(0)
+  lastUsed          DateTime?
+  
+  createdBy         String
+  user              User      @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([type])
+  @@index([category])
+  @@index([isActive])
+  @@index([createdBy])
+  @@map("notification_templates")
+}
+
+// Gateway Configuration model
+model GatewayConfig {
+  id                String    @id @default(cuid())
+  type              GatewayType
+  name              String    // Display name
+  provider          String    // Provider name (Twilio, AWS SES, etc.)
+  
+  // Configuration (stored as JSON string for flexibility)
+  config            String    // JSON string with provider-specific config
+  
+  // Status
+  isActive          Boolean   @default(false)
+  isDefault         Boolean   @default(false)
+  
+  // Test credentials
+  testApiKey        String?   // For testing
+  testApiSecret     String?
+  
+  // Statistics
+  totalSent         Int       @default(0)
+  successCount      Int       @default(0)
+  failureCount      Int       @default(0)
+  lastUsed          DateTime?
+  
+  createdBy         String
+  user              User      @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([type])
+  @@index([isActive])
+  @@index([isDefault])
+  @@map("gateway_configs")
+}
+
+enum NotificationType {
+  SMS
+  EMAIL
+  WHATSAPP
+  PUSH
+}
+
+enum NotificationCategory {
+  REPORT_READY
+  DONATION_REMINDER
+  THANK_YOU
+  PRIVATE_MESSAGE
+  SPONSOR
+  NEXT_DONATION_DATE
+  CUSTOM
+}
+
+enum GatewayType {
+  SMS
+  EMAIL
+  WHATSAPP
 }

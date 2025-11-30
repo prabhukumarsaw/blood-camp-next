@@ -56,13 +56,13 @@ export function OrgSwitcher({
                 <GalleryVerticalEnd className='size-4' />
               </div>
               <div className='flex flex-col gap-0.5 leading-none'>
-                <span className='font-semibold'>Next Starter</span>
-                <span className=''>{selectedTenant.name}</span>
+                <span className='font-semibold'>Blood Care</span>
+                {/* <span className=''>{selectedTenant.name}</span> */}
               </div>
               <ChevronsUpDown className='ml-auto' />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
-          <DropdownMenuContent
+          {/* <DropdownMenuContent
             className='w-[--radix-dropdown-menu-trigger-width]'
             align='start'
           >
@@ -77,7 +77,7 @@ export function OrgSwitcher({
                 )}
               </DropdownMenuItem>
             ))}
-          </DropdownMenuContent>
+          </DropdownMenuContent> */}
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>

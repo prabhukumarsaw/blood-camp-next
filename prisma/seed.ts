@@ -49,12 +49,6 @@ async function main() {
     { name: "Read Own Media", slug: "media.read", resource: "media", action: "read" },
     { name: "Read All Media", slug: "media.read.all", resource: "media", action: "read.all" },
     { name: "Delete Media", slug: "media.delete", resource: "media", action: "delete" },
-    // Advertisement permissions
-    { name: "Create Advertisement", slug: "advertisement.create", resource: "advertisement", action: "create" },
-    { name: "Read Own Advertisement", slug: "advertisement.read", resource: "advertisement", action: "read" },
-    { name: "Read All Advertisement", slug: "advertisement.read.all", resource: "advertisement", action: "read.all" },
-    { name: "Update Advertisement", slug: "advertisement.update", resource: "advertisement", action: "update" },
-    { name: "Delete Advertisement", slug: "advertisement.delete", resource: "advertisement", action: "delete" },
     // Analytics permissions
     { name: "Read Analytics", slug: "analytics.read", resource: "analytics", action: "read" },
     // Menu permissions
@@ -62,6 +56,11 @@ async function main() {
     { name: "Read Menu", slug: "menu.read", resource: "menu", action: "read" },
     { name: "Update Menu", slug: "menu.update", resource: "menu", action: "update" },
     { name: "Delete Menu", slug: "menu.delete", resource: "menu", action: "delete" },
+    // Donor/Blood permissions
+    { name: "Create Donor", slug: "donor.create", resource: "donor", action: "create" },
+    { name: "Read Donor", slug: "donor.read", resource: "donor", action: "read" },
+    { name: "Update Donor", slug: "donor.update", resource: "donor", action: "update" },
+    { name: "Delete Donor", slug: "donor.delete", resource: "donor", action: "delete" },
   ];
 
   console.log("📝 Creating permissions...");
@@ -92,14 +91,16 @@ async function main() {
     // News management menus
     { name: "News", slug: "news", path: "/dashboard/news", icon: "news", order: 4, isPublic: false },
     { name: "Media", slug: "media", path: "/dashboard/media", icon: "media", order: 5, isPublic: false },
-    { name: "Advertisements", slug: "advertisements", path: "/dashboard/advertisements", icon: "ads", order: 6, isPublic: false },
-    { name: "Analytics", slug: "analytics", path: "/dashboard/analytics", icon: "analytics", order: 7, isPublic: false },
-    { name: "Menus", slug: "menus", path: "/dashboard/menus", icon: "menu", order: 12, isPublic: false },
+    { name: "Analytics", slug: "analytics", path: "/dashboard/analytics", icon: "analytics", order: 6, isPublic: false },
+    { name: "Report Upload", slug: "report-upload", path: "/dashboard/bloodManagement/ReportUpload", icon: "upload", order: 7, isPublic: false },
+    { name: "Notification Setup", slug: "notification-setup", path: "/dashboard/bloodManagement/notificationSetup", icon: "notification", order: 8, isPublic: false },
+    { name: "Menus", slug: "menus", path: "/dashboard/menus", icon: "menu", order: 13, isPublic: false },
     // Admin menus
-    { name: "Users", slug: "users", path: "/dashboard/users", icon: "users", order: 8, isPublic: false },
-    { name: "Roles", slug: "roles", path: "/dashboard/roles", icon: "roles", order: 9, isPublic: false },
-    { name: "Permissions", slug: "permissions", path: "/dashboard/permissions", icon: "permissions", order: 10, isPublic: false },
-    { name: "Audit Logs", slug: "logs", path: "/dashboard/logs", icon: "logs", order: 11, isPublic: false },
+    { name: "Blood Panel", slug: "blood-panel", path: "/dashboard/blood-panel", icon: "blood", order: 9, isPublic: false },
+    { name: "Users", slug: "users", path: "/dashboard/users", icon: "users", order: 10, isPublic: false },
+    { name: "Roles", slug: "roles", path: "/dashboard/roles", icon: "roles", order: 11, isPublic: false },
+    { name: "Permissions", slug: "permissions", path: "/dashboard/permissions", icon: "permissions", order: 12, isPublic: false },
+    { name: "Audit Logs", slug: "logs", path: "/dashboard/logs", icon: "logs", order: 14, isPublic: false },
     // Category menus (public - used as news categories)
     { name: "Crime", slug: "crime", path: "/news/crime", icon: "crime", order: 1, isPublic: true },
     { name: "State", slug: "state", path: "/news/state", icon: "state", order: 2, isPublic: true },
@@ -384,19 +385,172 @@ async function main() {
 
   console.log("  ✓ Assigned news, media, and analytics permissions to Editor role");
 
+  // Create Admin role (same as superadmin but not default)
+  console.log("👨‍💼 Creating Admin role...");
+  let adminRole = await prisma.role.findUnique({
+    where: { slug: "admin" },
+  });
+
+  if (!adminRole) {
+    adminRole = await prisma.role.create({
+      data: {
+        name: "Admin",
+        slug: "admin",
+        description: "Administrator with full access except permission management",
+        isActive: true,
+      },
+    });
+    console.log("  ✓ Created Admin role");
+  } else {
+    console.log("  - Admin role already exists");
+  }
+
+  // Assign all permissions except permission management to admin
+  await prisma.rolePermission.deleteMany({
+    where: { roleId: adminRole.id },
+  });
+  await prisma.roleMenu.deleteMany({
+    where: { roleId: adminRole.id },
+  });
+
+  const adminPermissions = createdPermissions.filter(
+    (p) => !p.slug.startsWith("permission.")
+  );
+
+  await prisma.rolePermission.createMany({
+    data: adminPermissions.map((perm) => ({
+      roleId: adminRole!.id,
+      permissionId: perm.id,
+    })),
+    skipDuplicates: true,
+  });
+
+  // Assign all menus except permissions menu to admin
+  const adminMenus = createdMenus.filter(
+    (m) => m.slug !== "permissions"
+  );
+
+  await prisma.roleMenu.createMany({
+    data: adminMenus.map((menu) => ({
+      roleId: adminRole!.id,
+      menuId: menu.id,
+    })),
+    skipDuplicates: true,
+  });
+
+  console.log("  ✓ Assigned permissions and menus to Admin role (except permission management)");
+
+  // Create Camp Ranchi role
+  console.log("🏥 Creating Camp Ranchi role...");
+  let campRanchiRole = await prisma.role.findUnique({
+    where: { slug: "camp-ranchi" },
+  });
+
+  if (!campRanchiRole) {
+    campRanchiRole = await prisma.role.create({
+      data: {
+        name: "Camp Ranchi",
+        slug: "camp-ranchi",
+        description: "Camp Ranchi staff with blood management and blog view access",
+        isActive: true,
+      },
+    });
+    console.log("  ✓ Created Camp Ranchi role");
+  } else {
+    console.log("  - Camp Ranchi role already exists");
+  }
+
+  // Assign blood CRUD and blog read permissions to Camp Ranchi
+  await prisma.rolePermission.deleteMany({
+    where: { roleId: campRanchiRole.id },
+  });
+  await prisma.roleMenu.deleteMany({
+    where: { roleId: campRanchiRole.id },
+  });
+
+  const campRanchiPermissions = createdPermissions.filter(
+    (p) => p.slug.startsWith("donor.") || p.slug === "blog.read" || p.slug === "blog.read.all"
+  );
+
+  await prisma.rolePermission.createMany({
+    data: campRanchiPermissions.map((perm) => ({
+      roleId: campRanchiRole!.id,
+      permissionId: perm.id,
+    })),
+    skipDuplicates: true,
+  });
+
+  // Assign blood panel and blogs menus to Camp Ranchi
+  const campRanchiMenus = createdMenus.filter(
+    (m) => m.slug === "dashboard" || m.slug === "blood-panel" || m.slug === "blogs" || m.slug === "profile"
+  );
+
+  await prisma.roleMenu.createMany({
+    data: campRanchiMenus.map((menu) => ({
+      roleId: campRanchiRole!.id,
+      menuId: menu.id,
+    })),
+    skipDuplicates: true,
+  });
+
+  console.log("  ✓ Assigned blood CRUD and blog view permissions to Camp Ranchi role");
+
+  // Create User role (default)
+  console.log("👤 Creating User role...");
+  let userRole = await prisma.role.findUnique({
+    where: { slug: "user" },
+  });
+
+  if (!userRole) {
+    userRole = await prisma.role.create({
+      data: {
+        name: "User",
+        slug: "user",
+        description: "Default role for registered users",
+        isActive: true,
+      },
+    });
+    console.log("  ✓ Created User role");
+  } else {
+    console.log("  - User role already exists");
+  }
+
+  // User role has minimal permissions (just dashboard and profile)
+  await prisma.rolePermission.deleteMany({
+    where: { roleId: userRole.id },
+  });
+  await prisma.roleMenu.deleteMany({
+    where: { roleId: userRole.id },
+  });
+
+  // Assign only dashboard and profile menus to user
+  const userMenus = createdMenus.filter(
+    (m) => m.slug === "dashboard" || m.slug === "profile"
+  );
+
+  await prisma.roleMenu.createMany({
+    data: userMenus.map((menu) => ({
+      roleId: userRole!.id,
+      menuId: menu.id,
+    })),
+    skipDuplicates: true,
+  });
+
+  console.log("  ✓ Assigned minimal menus to User role");
+
   // Create default admin user
   console.log("👤 Creating default admin user...");
   const adminEmail = process.env.DEFAULT_ADMIN_EMAIL || "admin@example.com";
   const adminUsername = process.env.DEFAULT_ADMIN_USERNAME || "admin";
   const adminPassword = process.env.DEFAULT_ADMIN_PASSWORD || "Admin@123";
 
-  const existingAdmin = await prisma.user.findUnique({
+  let existingAdmin = await prisma.user.findUnique({
     where: { email: adminEmail },
   });
 
   if (!existingAdmin) {
     const hashedPassword = await bcrypt.hash(adminPassword, 10);
-    const adminUser = await prisma.user.create({
+    existingAdmin = await prisma.user.create({
       data: {
         email: adminEmail,
         username: adminUsername,
@@ -412,7 +566,7 @@ async function main() {
     // Assign superadmin role
     await prisma.userRole.create({
       data: {
-        userId: adminUser.id,
+        userId: existingAdmin.id,
         roleId: superadminRole.id,
       },
     });
@@ -424,6 +578,205 @@ async function main() {
     console.log("  ⚠️  Please change the default password after first login!");
   } else {
     console.log("  - Admin user already exists");
+  }
+
+  // Seed Notification Templates
+  console.log("📧 Seeding notification templates...");
+  if (superadminRole && existingAdmin) {
+    const notificationTemplates = [
+      // SMS Templates
+      {
+        name: "Report Ready - SMS",
+        type: "SMS",
+        category: "REPORT_READY",
+        subject: null,
+        content: "Dear {name}, Your blood test report is ready. Download: {link} - BloodCare Team",
+        isActive: true,
+      },
+      {
+        name: "Thank You - SMS",
+        type: "SMS",
+        category: "THANK_YOU",
+        subject: null,
+        content: "Dear {name}, Thank you for your blood donation at {location}. Your contribution saves lives! - BloodCare Team",
+        isActive: true,
+      },
+      {
+        name: "Donation Reminder - SMS",
+        type: "SMS",
+        category: "DONATION_REMINDER",
+        subject: null,
+        content: "Dear {name}, You are eligible to donate blood again. Next donation date: {nextDonationDate}. Visit us at {location} - BloodCare Team",
+        isActive: true,
+      },
+      {
+        name: "Next Donation Date - SMS",
+        type: "SMS",
+        category: "NEXT_DONATION_DATE",
+        subject: null,
+        content: "Dear {name}, Your next eligible donation date is {nextDonationDate}. We look forward to seeing you! - BloodCare Team",
+        isActive: true,
+      },
+      // Email Templates
+      {
+        name: "Report Ready - Email",
+        type: "EMAIL",
+        category: "REPORT_READY",
+        subject: "Your Blood Test Report is Ready - BloodCare",
+        content: "Dear {name},\n\nYour blood test report is now available for download.\n\nDownload Report: {link}\n\nReport Date: {reportDate}\n\nIf you have any questions, please contact us.\n\nThank you,\nBloodCare Team",
+        isActive: true,
+      },
+      {
+        name: "Thank You - Email",
+        type: "EMAIL",
+        category: "THANK_YOU",
+        subject: "Thank You for Your Blood Donation - BloodCare",
+        content: "Dear {name},\n\nWe would like to express our heartfelt gratitude for your blood donation at {location}.\n\nYour selfless act of donating blood can save up to 3 lives. Your contribution makes a significant difference in our community.\n\nDonor ID: {donorId}\nBlood Group: {bloodGroup}\n\nThank you for being a lifesaver!\n\nBest regards,\nBloodCare Team",
+        isActive: true,
+      },
+      {
+        name: "Donation Reminder - Email",
+        type: "EMAIL",
+        category: "DONATION_REMINDER",
+        subject: "You're Eligible to Donate Blood Again - BloodCare",
+        content: "Dear {name},\n\nGreat news! You are now eligible to donate blood again.\n\nLast Donation: {lastDonationDate}\nNext Eligible Date: {nextDonationDate}\n\nWe encourage you to schedule your next donation appointment. Your continued support helps us maintain an adequate blood supply.\n\nLocation: {location}\n\nThank you for your ongoing commitment to saving lives!\n\nBest regards,\nBloodCare Team",
+        isActive: true,
+      },
+      {
+        name: "Private Message - Email",
+        type: "EMAIL",
+        category: "PRIVATE_MESSAGE",
+        subject: "Message from BloodCare",
+        content: "Dear {name},\n\nWe hope this message finds you well.\n\nWe wanted to reach out regarding your recent blood donation. Your contribution is invaluable to our mission.\n\nIf you have any questions or concerns, please don't hesitate to contact us.\n\nThank you for your support.\n\nBest regards,\nBloodCare Team",
+        isActive: true,
+      },
+      // WhatsApp Templates
+      {
+        name: "Report Ready - WhatsApp",
+        type: "WHATSAPP",
+        category: "REPORT_READY",
+        subject: null,
+        content: "🩸 *Blood Test Report Ready*\n\nHello {name}!\n\nYour blood test report is now available.\n\n📄 Download: {link}\n📅 Report Date: {reportDate}\n\nThank you for choosing BloodCare!\n\n_BloodCare Team_",
+        isActive: true,
+      },
+      {
+        name: "Thank You - WhatsApp",
+        type: "WHATSAPP",
+        category: "THANK_YOU",
+        subject: null,
+        content: "❤️ *Thank You for Your Donation!*\n\nDear {name},\n\nWe are grateful for your blood donation at {location}.\n\nYour selfless act can save up to 3 lives! 🙏\n\nDonor ID: {donorId}\nBlood Group: {bloodGroup}\n\nThank you for being a lifesaver!\n\n_BloodCare Team_",
+        isActive: true,
+      },
+      {
+        name: "Donation Reminder - WhatsApp",
+        type: "WHATSAPP",
+        category: "DONATION_REMINDER",
+        subject: null,
+        content: "🩸 *Donation Reminder*\n\nHello {name}!\n\nYou are eligible to donate blood again.\n\n📅 Next Eligible Date: {nextDonationDate}\n📍 Location: {location}\n\nYour continued support saves lives!\n\n_BloodCare Team_",
+        isActive: true,
+      },
+      {
+        name: "Next Donation Date - WhatsApp",
+        type: "WHATSAPP",
+        category: "NEXT_DONATION_DATE",
+        subject: null,
+        content: "📅 *Next Donation Date*\n\nHello {name}!\n\nYour next eligible donation date:\n\n📆 {nextDonationDate}\n\nWe look forward to seeing you again!\n\n_BloodCare Team_",
+        isActive: true,
+      },
+    ];
+
+    for (const template of notificationTemplates) {
+      const existing = await prisma.notificationTemplate.findFirst({
+        where: {
+          name: template.name,
+          type: template.type as any,
+        },
+      });
+
+      if (!existing) {
+        // Extract variables from content
+        const variableRegex = /\{(\w+)\}/g;
+        const matches = template.content.matchAll(variableRegex);
+        const variables = Array.from(matches, (m) => m[1]);
+        const uniqueVariables = [...new Set(variables)];
+
+        await prisma.notificationTemplate.create({
+          data: {
+            ...template,
+            variables: uniqueVariables,
+            createdBy: existingAdmin.id,
+          },
+        });
+        console.log(`  ✓ Created template: ${template.name}`);
+      } else {
+        console.log(`  - Template already exists: ${template.name}`);
+      }
+    }
+  }
+
+  // Seed Gateway Configurations
+  console.log("🔌 Seeding gateway configurations...");
+  if (superadminRole && existingAdmin) {
+    const gatewayConfigs = [
+      {
+        type: "SMS",
+        name: "Twilio SMS Gateway",
+        provider: "Twilio",
+        config: JSON.stringify({
+          accountSid: "YOUR_TWILIO_ACCOUNT_SID",
+          authToken: "YOUR_TWILIO_AUTH_TOKEN",
+          fromNumber: "+1234567890",
+        }),
+        isActive: false,
+        isDefault: true,
+      },
+      {
+        type: "EMAIL",
+        name: "AWS SES Email Gateway",
+        provider: "AWS SES",
+        config: JSON.stringify({
+          accessKeyId: "YOUR_AWS_ACCESS_KEY",
+          secretAccessKey: "YOUR_AWS_SECRET_KEY",
+          region: "us-east-1",
+          fromEmail: "noreply@bloodcare.com",
+        }),
+        isActive: false,
+        isDefault: true,
+      },
+      {
+        type: "WHATSAPP",
+        name: "WhatsApp Business API",
+        provider: "WhatsApp Business API",
+        config: JSON.stringify({
+          apiKey: "YOUR_WHATSAPP_API_KEY",
+          phoneNumberId: "YOUR_PHONE_NUMBER_ID",
+          businessAccountId: "YOUR_BUSINESS_ACCOUNT_ID",
+        }),
+        isActive: false,
+        isDefault: true,
+      },
+    ];
+
+    for (const gateway of gatewayConfigs) {
+      const existing = await prisma.gatewayConfig.findFirst({
+        where: {
+          name: gateway.name,
+          type: gateway.type as any,
+        },
+      });
+
+      if (!existing) {
+        await prisma.gatewayConfig.create({
+          data: {
+            ...gateway,
+            createdBy: existingAdmin.id,
+          },
+        });
+        console.log(`  ✓ Created gateway: ${gateway.name}`);
+      } else {
+        console.log(`  - Gateway already exists: ${gateway.name}`);
+      }
+    }
   }
 
   console.log("✅ Seeding completed!");

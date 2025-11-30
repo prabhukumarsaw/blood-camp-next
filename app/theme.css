@@ -1,39 +1,104 @@
 body {
   @apply overscroll-none bg-transparent;
+  font-size: 16px; /* Base font size */
+  line-height: 1.5;
+  
+  /* Responsive base font size */
+  @media (max-width: 640px) {
+    font-size: 14px; /* Slightly smaller on mobile */
+  }
+  
+  @media (min-width: 1024px) {
+    font-size: 16px; /* Standard on desktop */
+  }
+  
+  @media (min-width: 1280px) {
+    font-size: 17px; /* Slightly larger on xl screens */
+  }
 }
 
 :root {
   --font-sans: var(--font-inter);
   --header-height: calc(var(--spacing) * 12 + 1px);
+  
+  /* Golden Ratio (φ = 1.618) - Applied throughout */
+  --phi: 1.618;
+  --phi-inverse: 0.618; /* 1/φ */
+  
+  /* Typography Scale - Standard sizes with responsive scaling */
+  --text-xs: 0.75rem;      /* 12px */
+  --text-sm: 0.875rem;     /* 14px */
+  --text-base: 1rem;       /* 16px */
+  --text-lg: 1.125rem;     /* 18px */
+  --text-xl: 1.25rem;      /* 20px */
+  --text-2xl: 1.5rem;      /* 24px */
+  --text-3xl: 1.875rem;    /* 30px */
+  --text-4xl: 2.25rem;     /* 36px */
+  --text-5xl: 3rem;        /* 48px */
+  
+  /* Spacing Scale using Golden Ratio */
+  --space-1: calc(0.25rem / var(--phi));
+  --space-2: 0.25rem;
+  --space-3: calc(0.25rem * var(--phi));
+  --space-4: calc(0.25rem * var(--phi) * var(--phi));
+  --space-5: calc(0.25rem * var(--phi) * var(--phi) * var(--phi));
+  --space-6: calc(0.25rem * var(--phi) * var(--phi) * var(--phi) * var(--phi));
 }
 
 .theme-scaled {
   @media (min-width: 1024px) {
-    --radius: 0.6rem;
-    --text-lg: 1.05rem;
-    --text-base: 0.85rem;
-    --text-sm: 0.8rem;
-    --spacing: 0.222222rem;
+    /* Golden Ratio applied to radius */
+    --radius: calc(0.6rem * var(--phi));
+    /* Responsive typography scaling - larger on desktop */
+    --text-lg: 1.25rem;     /* 20px */
+    --text-base: 1.0625rem; /* 17px */
+    --text-sm: 0.9375rem;   /* 15px */
+    --spacing: calc(0.222222rem * var(--phi));
   }
 
   [data-slot='card'] {
-    --spacing: 0.16rem;
+    --spacing: calc(0.16rem * var(--phi));
   }
 
   [data-slot='select-trigger'],
   [data-slot='toggle-group-item'] {
-    --spacing: 0.222222rem;
+    --spacing: calc(0.222222rem * var(--phi));
   }
 }
 
+/* Blood Theme - Default (Applied by default) */
 .theme-default,
-.theme-default-scaled {
-  --primary: var(--color-neutral-600);
-  --primary-foreground: var(--color-neutral-50);
+.theme-default-scaled,
+:root {
+  /* Blood Red Primary Colors */
+  --primary: oklch(0.45 0.18 15); /* Deep crimson */
+  --primary-foreground: oklch(0.98 0.01 15); /* Cream white */
+  
+  /* Blood Theme Accent */
+  --accent: oklch(0.75 0.12 45); /* Warm gold accent */
+  --accent-foreground: oklch(0.25 0.05 15);
 
   @variant dark {
-    --primary: var(--color-neutral-500);
-    --primary-foreground: var(--color-neutral-50);
+    --primary: oklch(0.65 0.20 15); /* Bright crimson for dark */
+    --primary-foreground: oklch(0.98 0.01 15);
+    --accent: oklch(0.70 0.15 45); /* Warm gold for dark */
+    --accent-foreground: oklch(0.15 0.03 15);
+  }
+}
+
+/* Blood Theme Variant */
+.theme-blood,
+.theme-blood-scaled {
+  --primary: oklch(0.45 0.18 15);
+  --primary-foreground: oklch(0.98 0.01 15);
+  --accent: oklch(0.75 0.12 45);
+  --accent-foreground: oklch(0.25 0.05 15);
+
+  @variant dark {
+    --primary: oklch(0.65 0.20 15);
+    --primary-foreground: oklch(0.98 0.01 15);
+    --accent: oklch(0.70 0.15 45);
+    --accent-foreground: oklch(0.15 0.03 15);
   }
 }
 

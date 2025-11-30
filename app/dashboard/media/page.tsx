@@ -26,14 +26,13 @@ export default async function MediaPage({
     redirect("/dashboard")
   }
 
-  const params = await searchParams
-  const page = Number.parseInt(params.page || "1")
-  const search = params.search
-  const viewMode = (params.view as "grid" | "list") || "grid"
+  const { page: pageParam, search, view, type } = await searchParams
+  const page = pageParam ? Math.max(1, parseInt(pageParam, 10) || 1) : 1
+  const viewMode = (view as "grid" | "list") || "grid"
 
   const filters: any = {}
-  if (params.type) {
-    filters.resourceType = params.type as "image" | "video" | "raw"
+  if (type) {
+    filters.resourceType = type as "image" | "video" | "raw"
   }
 
   const result = await getUserMedia(page, 24, search, filters)

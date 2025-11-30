@@ -3,7 +3,7 @@
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth/jwt-server";
-import { hasPermission } from "@/lib/auth/permissions";
+import { hasPermission, SUPERADMIN_ROLE } from "@/lib/auth/permissions";
 import { createAuditLog } from "@/lib/audit-log";
 import { generateUsernameFromEmail, generatePassword } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
@@ -70,6 +70,17 @@ export async function createUser(data: z.infer<typeof createUserSchema>) {
     });
     if (existingUsername) {
       return { success: false, error: "Username already exists" };
+    }
+
+    // Prevent admin from assigning superadmin role
+    const isSuperadmin = await isCurrentUserSuperadmin(currentUser.userId);
+    if (!isSuperadmin && validated.roleIds.length > 0) {
+      const superadminRole = await prisma.role.findUnique({
+        where: { slug: SUPERADMIN_ROLE },
+      });
+      if (superadminRole && validated.roleIds.includes(superadminRole.id)) {
+        return { success: false, error: "You cannot assign superadmin role" };
+      }
     }
 
     // Generate password if not provided
@@ -153,9 +164,37 @@ export async function updateUser(data: z.infer<typeof updateUserSchema>) {
     // Check if user exists
     const existingUser = await prisma.user.findUnique({
       where: { id: validated.id },
+      include: {
+        roles: {
+          include: {
+            role: true,
+          },
+        },
+      },
     });
     if (!existingUser) {
       return { success: false, error: "User not found" };
+    }
+
+    // Prevent admin from modifying superadmin
+    const isSuperadmin = await isCurrentUserSuperadmin(currentUser.userId);
+    if (!isSuperadmin) {
+      const isTargetSuperadmin = existingUser.roles.some(
+        (ur: any) => ur.role.slug === SUPERADMIN_ROLE && ur.role.isActive
+      );
+      if (isTargetSuperadmin) {
+        return { success: false, error: "You cannot modify superadmin users" };
+      }
+    }
+
+    // Prevent assigning superadmin role if not superadmin
+    if (validated.roleIds) {
+      const superadminRole = await prisma.role.findUnique({
+        where: { slug: SUPERADMIN_ROLE },
+      });
+      if (superadminRole && validated.roleIds.includes(superadminRole.id) && !isSuperadmin) {
+        return { success: false, error: "You cannot assign superadmin role" };
+      }
     }
 
     // Check email uniqueness if changing
@@ -257,10 +296,28 @@ export async function deleteUser(userId: string) {
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
+      include: {
+        roles: {
+          include: {
+            role: true,
+          },
+        },
+      },
     });
 
     if (!user) {
       return { success: false, error: "User not found" };
+    }
+
+    // Prevent admin from deleting superadmin
+    const isSuperadmin = await isCurrentUserSuperadmin(currentUser.userId);
+    if (!isSuperadmin) {
+      const isTargetSuperadmin = user.roles.some(
+        (ur: any) => ur.role.slug === SUPERADMIN_ROLE && ur.role.isActive
+      );
+      if (isTargetSuperadmin) {
+        return { success: false, error: "You cannot delete superadmin users" };
+      }
     }
 
     await prisma.user.delete({
@@ -285,6 +342,17 @@ export async function deleteUser(userId: string) {
 }
 
 /**
+ * Check if current user is superadmin
+ */
+async function isCurrentUserSuperadmin(userId: string): Promise<boolean> {
+  const userRoles = await prisma.userRole.findMany({
+    where: { userId },
+    include: { role: true },
+  });
+  return userRoles.some((ur) => ur.role.slug === SUPERADMIN_ROLE && ur.role.isActive);
+}
+
+/**
  * Get all users with pagination
  * @param page - Page number
  * @param limit - Items per page
@@ -302,6 +370,7 @@ export async function getUsers(page: number = 1, limit: number = 10, search?: st
       return { success: false, error: "You don't have permission to view users" };
     }
 
+    const isSuperadmin = await isCurrentUserSuperadmin(currentUser.userId);
     const skip = (page - 1) * limit;
     const where: any = {};
 
@@ -312,6 +381,23 @@ export async function getUsers(page: number = 1, limit: number = 10, search?: st
         { firstName: { contains: search, mode: "insensitive" } },
         { lastName: { contains: search, mode: "insensitive" } },
       ];
+    }
+
+    // If not superadmin, exclude users with superadmin role
+    if (!isSuperadmin) {
+      const superadminRole = await prisma.role.findUnique({
+        where: { slug: SUPERADMIN_ROLE },
+      });
+      if (superadminRole) {
+        const superadminUserIds = await prisma.userRole.findMany({
+          where: { roleId: superadminRole.id },
+          select: { userId: true },
+        });
+        const superadminIds = superadminUserIds.map((ur) => ur.userId);
+        where.NOT = {
+          id: { in: superadminIds },
+        };
+      }
     }
 
     const [users, total] = await Promise.all([
@@ -373,6 +459,22 @@ export async function getUserById(userId: string) {
     const hasAccess = await hasPermission(currentUser.userId, "user.read");
     if (!hasAccess) {
       return { success: false, error: "You don't have permission to view users" };
+    }
+
+    const isSuperadmin = await isCurrentUserSuperadmin(currentUser.userId);
+
+    // If not superadmin, check if target user is superadmin
+    if (!isSuperadmin) {
+      const targetUserRoles = await prisma.userRole.findMany({
+        where: { userId },
+        include: { role: true },
+      });
+      const isTargetSuperadmin = targetUserRoles.some(
+        (ur) => ur.role.slug === SUPERADMIN_ROLE && ur.role.isActive
+      );
+      if (isTargetSuperadmin) {
+        return { success: false, error: "Access denied" };
+      }
     }
 
     const user = await prisma.user.findUnique({

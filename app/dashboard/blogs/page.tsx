@@ -15,7 +15,7 @@ import PageContainer from "@/components/layout/page-container";
 export default async function BlogsPage({
   searchParams,
 }: {
-  searchParams: { page?: string; search?: string };
+  searchParams: Promise<{ page?: string; search?: string }>;
 }) {
   const user = await getCurrentUser();
   if (!user) {
@@ -28,8 +28,8 @@ export default async function BlogsPage({
     redirect("/dashboard");
   }
 
-  const page = parseInt(searchParams.page || "1");
-  const search = searchParams.search;
+  const { page: pageParam, search } = await searchParams;
+  const page = pageParam ? Math.max(1, parseInt(pageParam, 10) || 1) : 1;
 
   const result = await getUserBlogs(page, 10, search);
 
@@ -42,7 +42,7 @@ export default async function BlogsPage({
   }
 
   return (
-    <PageContainer>
+    <PageContainer >
       <div className='flex flex-1 flex-col space-y-2'>
       <div className="flex items-center justify-between">
         <div>

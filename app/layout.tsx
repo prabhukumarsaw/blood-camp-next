@@ -12,8 +12,8 @@ import './globals.css';
 import './theme.css';
 
 const META_THEME_COLORS = {
-  light: '#ffffff',
-  dark: '#09090b'
+  light: '#fef7f7', /* Warm cream/ivory */
+  dark: '#2a0f0f' /* Deep burgundy */
 };
 
 export const metadata: Metadata = {

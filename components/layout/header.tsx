@@ -39,7 +39,7 @@ export default function Header({ user }: DashboardHeaderProps) {
         </div>
         <UserNav user={user} />
         <ModeToggle />
-        <ThemeSelector />
+        {/* <ThemeSelector /> */}
       </div>
     </header>
   );

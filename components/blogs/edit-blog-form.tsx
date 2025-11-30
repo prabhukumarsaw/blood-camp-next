@@ -14,6 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import PageContainer from "../layout/page-container";
 
 const updateBlogSchema = z.object({
   id: z.string(),
@@ -96,6 +97,8 @@ export function EditBlogForm({ blog }: EditBlogFormProps) {
   };
 
   return (
+      <PageContainer>
+              <div className="flex flex-1 flex-col space-y-2">
     <Card>
       <CardHeader>
         <CardTitle>Blog Information</CardTitle>
@@ -196,6 +199,8 @@ export function EditBlogForm({ blog }: EditBlogFormProps) {
         </form>
       </CardContent>
     </Card>
+    </div>
+    </PageContainer>  
   );
 }
 

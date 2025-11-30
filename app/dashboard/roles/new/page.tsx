@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { getPermissions } from "@/lib/actions/permissions";
 import { getMenus } from "@/lib/actions/menus";
 import { CreateRoleForm } from "@/components/roles/create-role-form";
+import PageContainer from "@/components/layout/page-container";
 
 /**
  * Create Role Page
@@ -29,9 +30,10 @@ export default async function CreateRolePage() {
   const menus: any = menusResult.success ? menusResult.menus : [];
 
   return (
-    <div className="space-y-6">
+    <PageContainer>
+      <div className='flex flex-1 flex-col space-y-2'>
       <div>
-        <h1 className="text-3xl font-bold">Create New Role</h1>
+        <h1 className="text-2xl font-bold">Create New Role</h1>
         <p className="text-muted-foreground mt-2">
           Define a new role with permissions and menu access
         </p>
@@ -39,6 +41,7 @@ export default async function CreateRolePage() {
 
       <CreateRoleForm permissions={permissions} menus={menus} />
     </div>
+    </PageContainer>
   );
 }
 

@@ -167,7 +167,7 @@ export function MediaPicker({
           {value ? "Change Media" : label}
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
+      <DialogContent className="max-w-4xl md:max-w-5xl max-h-[80vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle>{label}</DialogTitle>
           {description && <DialogDescription>{description}</DialogDescription>}
@@ -202,7 +202,7 @@ export function MediaPicker({
                 </div>
               ) : (
                 <div className="flex-1 overflow-auto">
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-4">
                     {filteredMedia.map((item) => (
                       <div
                         key={item.id}

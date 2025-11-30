@@ -3,6 +3,7 @@ import { checkPermission } from "@/lib/auth/permissions";
 import { redirect } from "next/navigation";
 import { getRoles } from "@/lib/actions/roles";
 import { CreateUserForm } from "@/components/users/create-user-form";
+import PageContainer from "@/components/layout/page-container";
 
 /**
  * Create User Page
@@ -23,9 +24,10 @@ export default async function CreateUserPage() {
   const roles: any = rolesResult.success ? rolesResult.roles : [];
 
   return (
-    <div className="space-y-6">
+    <PageContainer>
+      <div className='flex flex-1 flex-col space-y-2'>
       <div>
-        <h1 className="text-3xl font-bold">Create New User</h1>
+        <h1 className="text-2xl font-bold">Create New User</h1>
         <p className="text-muted-foreground mt-2">
           Add a new user to the system and assign roles
         </p>
@@ -33,6 +35,7 @@ export default async function CreateUserPage() {
 
       <CreateUserForm roles={roles} />
     </div>
+    </PageContainer>
   );
 }
 

@@ -12,7 +12,7 @@ import { EditRoleForm } from "@/components/roles/edit-role-form";
 export default async function EditRolePage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const user = await getCurrentUser();
   if (!user) {
@@ -24,9 +24,10 @@ export default async function EditRolePage({
     redirect("/dashboard/roles");
   }
 
+  const { id } = await params;
   const [roleResult, permissionsResult, menusResult] = await Promise.all([
-    getRoleById(params.id),
-    getPermissions(),
+    getRoleById(id),
+    getPermissions(), 
     getMenus(),
   ]);
 

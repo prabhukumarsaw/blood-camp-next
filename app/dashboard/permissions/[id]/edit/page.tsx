@@ -3,6 +3,7 @@ import { checkPermission } from "@/lib/auth/permissions";
 import { getPermissionById } from "@/lib/actions/permissions";
 import { redirect, notFound } from "next/navigation";
 import { EditPermissionForm } from "@/components/permissions/edit-permission-form";
+import PageContainer from "@/components/layout/page-container";
 
 /**
  * Edit Permission Page
@@ -10,7 +11,7 @@ import { EditPermissionForm } from "@/components/permissions/edit-permission-for
 export default async function EditPermissionPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const user = await getCurrentUser();
   if (!user) {
@@ -22,7 +23,10 @@ export default async function EditPermissionPage({
     redirect("/dashboard/permissions");
   }
 
-  const permissionResult = await getPermissionById(params.id);
+  const { id } = await params;
+  const permissionResult = await getPermissionById(id);
+
+  
   if (!permissionResult.success || !permissionResult.permission) {
     notFound();
   }
@@ -30,9 +34,10 @@ export default async function EditPermissionPage({
   const permission = permissionResult.permission;
 
   return (
-    <div className="space-y-6">
+    <PageContainer>
+      <div className='flex flex-1 flex-col space-y-2'>
       <div>
-        <h1 className="text-3xl font-bold">Edit Permission</h1>
+        <h1 className="text-2xl font-bold">Edit Permission</h1>
         <p className="text-muted-foreground mt-2">
           Update permission details
         </p>
@@ -40,6 +45,7 @@ export default async function EditPermissionPage({
 
       <EditPermissionForm permission={permissionResult.permission} />
     </div>
+    </PageContainer>
   );
 }
 
