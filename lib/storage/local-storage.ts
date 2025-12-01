@@ -157,11 +157,23 @@ async function generateBlurPlaceholder(buffer: Buffer): Promise<string> {
 
 /**
  * Ensure storage directories exist
+ *
+ * NOTE:
+ * - In local/self-hosted environments we write under `public/storage/media`.
+ * - On Vercel (serverless, read-only code filesystem) we instead write under
+ *   `/tmp/storage/media` which is the only writable area. Those files are
+ *   ephemeral and mainly used as a source for further processing (e.g. Blob).
  */
 async function ensureStorageDir(subdir?: string): Promise<string> {
-  const baseDir = path.join(process.cwd(), "public", STORAGE_DIR);
+  const isVercel = !!process.env.VERCEL;
+
+  const baseRoot = isVercel
+    ? "/tmp" // writable on Vercel serverless
+    : path.join(process.cwd(), "public");
+
+  const baseDir = path.join(baseRoot, STORAGE_DIR);
   const targetDir = subdir ? path.join(baseDir, subdir) : baseDir;
-  
+
   await fs.mkdir(targetDir, { recursive: true });
   return targetDir;
 }

@@ -6,17 +6,18 @@ import { useRouter } from "next/navigation";
 const HeroSection = () => {
   const router = useRouter();
   return (
-    <section className="relative bg-white overflow-hidden">
+    // Full-height hero so no black strip shows below on large screens
+    <section className="relative bg-white min-h-screen flex items-center overflow-hidden">
       {/* Background Shape */}
       <img
         src="/top-bg.png"
         alt="Background shape"
-        className="absolute top-0 right-0 z-0 "
+        className="absolute top-0 right-0 z-0 max-w-none w-[140%] md:w-auto"
       />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 py-10 md:py-5">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 py-10 md:py-12 lg:py-16 w-full">
         {/* Header */}
-        <div className="flex justify-between items-center mb-28">
+        <div className="flex justify-between items-center mb-10 md:mb-20">
           <img src="/logo.png" alt="Logo" className="w-[169px]" />
           <Button
           onClick={() => {
@@ -76,11 +77,11 @@ const HeroSection = () => {
           </div>
 
           {/* Image Content */}
-          <div className="flex justify-center -mt-40">
+          <div className="flex justify-center mt-8 md:-mt-20 lg:-mt-32">
             <img
               src="/bloodbank.png"
               alt="Donate blood illustration"
-              className="w-full "
+              className="w-full max-w-2xl"
             />
           </div>
         </div>
