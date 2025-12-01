@@ -5,6 +5,8 @@ import { getCurrentUser } from "@/lib/auth/jwt-server";
 import { hasPermission } from "@/lib/auth/permissions";
 import { createAuditLog } from "@/lib/audit-log";
 import { uploadToLocalStorage, deleteFromLocalStorage } from "@/lib/storage/local-storage";
+import { isBlobEnabled, promoteLocalUploadToBlob } from "@/lib/storage/blob-adapter";
+import path from "path";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -56,13 +58,26 @@ export async function uploadMedia(file: File, folder?: string, tags?: string[]) 
       };
     }
 
-    // Upload to local storage with compression
-    const uploadResult = await uploadToLocalStorage(file, file.name, {
+    // Upload to LOCAL storage with compression (existing behaviour).
+    // This keeps local/self-hosted installs working exactly as before.
+    let uploadResult = await uploadToLocalStorage(file, file.name, {
       folder: folder || "uploads",
       tags: tags || [],
       quality: 80,
       generateBlur: true,
     });
+
+    // If Vercel Blob is enabled (BLOB_READ_WRITE_TOKEN set),
+    // mirror the processed file to Blob and replace the URL with
+    // the Blob public URL. Local file remains as an internal cache/source.
+    if (isBlobEnabled) {
+      try {
+        uploadResult = await promoteLocalUploadToBlob(uploadResult);
+      } catch (err) {
+        console.error("Failed to mirror media upload to Vercel Blob:", err);
+        // Fallback: keep using the local URL for this upload.
+      }
+    }
 
     // Determine resource type
     const resourceType = uploadResult.mimeType.startsWith("image/") ? "image" : "raw";
