@@ -327,7 +327,7 @@ export default function ReportUpload() {
                 <CheckCircle className="w-5 h-5 text-blue-600" />
               </div>
               <div>
-                <h3 className="text-gray-900 font-medium">Auto-send Notifications</h3>
+                <h3 className=" font-medium">Auto-send Notifications</h3>
                 <p className="text-gray-500 text-sm">Automatically notify donors after successful upload</p>
               </div>
             </div>

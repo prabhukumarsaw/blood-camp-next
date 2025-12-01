@@ -278,7 +278,7 @@ export function AdvancedDonorForm({ initialData, donorId, redirectPath }: Advanc
                 name="dateOfBirth"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Date of Birth *</FormLabel>
+                    <FormLabel>Date of Birth <span className="text-red-500">*</span></FormLabel>
                     <FormControl>
                       <Input type="date" {...field} />
                     </FormControl>
@@ -292,7 +292,7 @@ export function AdvancedDonorForm({ initialData, donorId, redirectPath }: Advanc
                 name="gender"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Gender *</FormLabel>
+                    <FormLabel>Gender <span className="text-red-500">*</span></FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
@@ -319,7 +319,7 @@ export function AdvancedDonorForm({ initialData, donorId, redirectPath }: Advanc
                 name="bloodGroup"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Blood Group *</FormLabel>
+                    <FormLabel>Blood Group <span className="text-red-500">*</span></FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
@@ -343,7 +343,7 @@ export function AdvancedDonorForm({ initialData, donorId, redirectPath }: Advanc
                 name="weight"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Weight (kg) *</FormLabel>
+                    <FormLabel>Weight (kg) <span className="text-red-500">*</span></FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Scale className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -360,7 +360,7 @@ export function AdvancedDonorForm({ initialData, donorId, redirectPath }: Advanc
                 name="height"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Height (cm) *</FormLabel>
+                    <FormLabel>Height (cm) <span className="text-red-500">*</span></FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Ruler className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -392,7 +392,7 @@ export function AdvancedDonorForm({ initialData, donorId, redirectPath }: Advanc
                 name="mobileNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Mobile Number *</FormLabel>
+                    <FormLabel>Mobile Number <span className="text-red-500">*</span></FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -441,7 +441,7 @@ export function AdvancedDonorForm({ initialData, donorId, redirectPath }: Advanc
               name="permanentAddress"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Permanent Address *</FormLabel>
+                  <FormLabel>Permanent Address <span className="text-red-500">*</span></FormLabel>
                   <FormControl>
                     <Textarea placeholder="Enter your complete address" rows={3} {...field} />
                   </FormControl>
@@ -456,7 +456,7 @@ export function AdvancedDonorForm({ initialData, donorId, redirectPath }: Advanc
                 name="city"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>City *</FormLabel>
+                    <FormLabel>City <span className="text-red-500">*</span></FormLabel>
                     <FormControl>
                       <Input placeholder="Mumbai" {...field} />
                     </FormControl>
@@ -469,7 +469,7 @@ export function AdvancedDonorForm({ initialData, donorId, redirectPath }: Advanc
                 name="state"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>State *</FormLabel>
+                    <FormLabel>State <span className="text-red-500">*</span></FormLabel>
                     <FormControl>
                       <Input placeholder="Maharashtra" {...field} />
                     </FormControl>
@@ -482,7 +482,7 @@ export function AdvancedDonorForm({ initialData, donorId, redirectPath }: Advanc
                 name="pincode"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Pincode *</FormLabel>
+                    <FormLabel>Pincode <span className="text-red-500">*</span></FormLabel>
                     <FormControl>
                       <Input placeholder="400001" {...field} maxLength={6} />
                     </FormControl>
@@ -493,14 +493,14 @@ export function AdvancedDonorForm({ initialData, donorId, redirectPath }: Advanc
             </div>
 
             <div className="border-t pt-4">
-              <h3 className="text-sm font-semibold mb-4">Emergency Contact</h3>
+              <h3 className="text-sm font-semibold mb-4">Emergency Contact </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
                   name="emergencyContactName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Emergency Contact Name</FormLabel>
+                      <FormLabel>Emergency Contact Name <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <Input placeholder="Jane Doe" {...field} />
                       </FormControl>
@@ -513,7 +513,7 @@ export function AdvancedDonorForm({ initialData, donorId, redirectPath }: Advanc
                   name="emergencyContactNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Emergency Contact Number</FormLabel>
+                      <FormLabel>Emergency Contact Number <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <Input placeholder="9876543210" {...field} maxLength={10} />
                       </FormControl>
@@ -557,7 +557,7 @@ export function AdvancedDonorForm({ initialData, donorId, redirectPath }: Advanc
                   name="medicationDetails"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Medication Details *</FormLabel>
+                      <FormLabel>Medication Details <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <Textarea placeholder="Please specify medications" rows={3} {...field} />
                       </FormControl>
@@ -587,7 +587,7 @@ export function AdvancedDonorForm({ initialData, donorId, redirectPath }: Advanc
                   name="illnessDetails"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Illness Details *</FormLabel>
+                      <FormLabel>Illness Details <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <Textarea placeholder="Please specify illness" rows={3} {...field} />
                       </FormControl>
@@ -647,7 +647,7 @@ export function AdvancedDonorForm({ initialData, donorId, redirectPath }: Advanc
                   name="surgeryDetails"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Surgery Details *</FormLabel>
+                      <FormLabel>Surgery Details <span className="text-red-500">*</span></FormLabel>
                       <FormControl>
                         <Textarea placeholder="Please specify surgery details" rows={3} {...field} />
                       </FormControl>
@@ -738,7 +738,7 @@ export function AdvancedDonorForm({ initialData, donorId, redirectPath }: Advanc
               render={({ field }) => (
                 <FormItem>
                   <div className="mb-3">
-                    <FormLabel>Notification Preferences *</FormLabel>
+                    <FormLabel>Notification Preferences <span className="text-red-500">*</span></FormLabel>
                     <FormDescription>Select how you want to be notified</FormDescription>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -781,7 +781,7 @@ export function AdvancedDonorForm({ initialData, donorId, redirectPath }: Advanc
                     <div className="space-y-1 leading-none">
                       <FormLabel className="cursor-pointer">
                         I agree to donate blood voluntarily and consent to the use of my data for 
-                        medical and donation purposes only. *
+                        medical and donation purposes only. <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormMessage />
                     </div>
@@ -799,7 +799,7 @@ export function AdvancedDonorForm({ initialData, donorId, redirectPath }: Advanc
                     </FormControl>
                     <div className="space-y-1 leading-none">
                       <FormLabel className="cursor-pointer">
-                        I confirm that the information provided above is true and accurate. *
+                        I confirm that the information provided above is true and accurate. <span className="text-red-500">*</span>
                       </FormLabel>
                       <FormMessage />
                     </div>
@@ -812,7 +812,7 @@ export function AdvancedDonorForm({ initialData, donorId, redirectPath }: Advanc
 
         {/* Action Buttons */}
         <Card className="border-0 shadow-sm sticky bottom-0 bg-background z-10">
-          <CardContent className="pt-6">
+          <CardContent className="pt-2">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-2">
                 <Button
@@ -927,7 +927,7 @@ export function AdvancedDonorForm({ initialData, donorId, redirectPath }: Advanc
           </DialogHeader>
           {submittedDonor && (
             <div className="space-y-4">
-              <div className="bg-green-50 p-4 rounded-lg space-y-2">
+              <div className="bg-card/30 p-4 rounded-lg space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="font-medium text-sm">Donor ID:</span>
                   <Badge variant="outline" className="bg-green-100 text-green-800">
