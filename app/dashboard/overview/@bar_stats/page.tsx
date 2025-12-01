@@ -1,8 +1,5 @@
-import { BarGraph } from '@/features/overview/components/bar-graph';
-import { getDailyNewsPostCounts } from '@/lib/actions/chart-data';
-
 export default async function BarStats() {
-  const result = await getDailyNewsPostCounts(30);
-  
-  return <BarGraph data={result.data || []} total={result.total || 0} />;
+  // News-based bar statistics have been removed.
+  // This slot is kept for layout compatibility but intentionally renders nothing.
+  return null;
 }

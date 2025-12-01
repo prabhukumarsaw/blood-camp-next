@@ -10,6 +10,14 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetClose,
+} from "@/components/ui/sheet";
 import { toast } from "sonner";
 import { TemplateEditor } from "./template-editor";
 import { GatewayConfig } from "./gateway-config";
@@ -146,172 +154,204 @@ export function NotificationSetup() {
     }
   };
 
-  return (
-    <div className="flex h-[calc(100vh-14vh)] border rounded-lg bg-card overflow-hidden shadow-lg">
-      {/* Left Sidebar - 30% */}
-      <div className="w-[30%] border-r flex flex-col ">
-        {/* Header */}
-        <div className="p-2 border-b bg-card shadow-sm">
-          <div className="flex items-center justify-between mb-0">
-            <div>
-              <h2 className="text-lg font-bold ">
-                Templates
-              </h2>
-
+  const TemplateListItem = ({
+    template,
+    inSheet,
+  }: {
+    template: TemplateType;
+    inSheet?: boolean;
+  }) => {
+    const content = (
+      <div
+        onClick={() => handleTemplateSelect(template)}
+        className={`p-3 cursor-pointer hover:bg-card/10 transition-all border-l-2 ${selectedTemplate?.id === template.id
+          ? "bg-primary/10 border-l-primary shadow-sm"
+          : "border-l-transparent"
+          }`}
+      >
+        <div className="flex items-start justify-between mb-2">
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <div className={`p-1.5 rounded-md flex-shrink-0 ${getTypeColor(template.type)}`}>
+              {getTypeIcon(template.type)}
             </div>
-            <Button
-              size="sm"
-              onClick={viewMode === "templates" ? handleNewTemplate : handleNewGateway}
-              className="shadow-sm"
-            >
-              <Plus className="h-4 w-4 mr-1" />
-              New
-            </Button>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <p className="font-semibold text-sm truncate">{template.name}</p>
+                {template.isActive ? (
+                  <Badge variant="default" className="h-4 px-1.5 text-[10px] bg-green-500">
+                    Active
+                  </Badge>
+                ) : (
+                  <Badge variant="secondary" className="h-4 px-1.5 text-[10px]">
+                    Inactive
+                  </Badge>
+                )}
+              </div>
+              <p className="text-xs text-gray-500 mt-0.5 capitalize">
+                {template.category.replace(/_/g, " ").toLowerCase()}
+              </p>
+            </div>
           </div>
-
-          {/* Search */}
-          {/* <div className="relative mb-3">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-            <Input
-              placeholder="Search templates..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 h-9 bg-gray-50 border-gray-200 focus:bg-white"
-            />
-          </div> */}
-
-
         </div>
+        <p className="text-xs text-gray-600 line-clamp-2 mb-2 pl-8">
+          {template.content.substring(0, 80)}...
+        </p>
+        <div className="flex items-center justify-between text-xs text-gray-400 pl-8">
+          <span className="flex items-center gap-1">
+            <Send className="h-3 w-3" />
+            {template.usageCount}
+          </span>
+          {template.lastUsed && (
+            <span className="text-[10px]">{format(new Date(template.lastUsed), "MMM dd, yyyy")}</span>
+          )}
+        </div>
+      </div>
+    );
 
-        {/* Template Type Tabs */}
-        {viewMode === "templates" && (
-          <div className="border-b bg-card">
-            <Tabs value={templateTypeFilter} onValueChange={(v) => setTemplateTypeFilter(v as TemplateTypeFilter)}>
-              <TabsList className="w-full h-auto p-1 grid grid-cols-4 bg-transparent">
-                <TabsTrigger
-                  value="all"
-                  className="text-xs py-2 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700"
-                >
-                  All ({templates.length})
-                </TabsTrigger>
-                <TabsTrigger
-                  value="SMS"
-                  className="text-xs py-2 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700"
-                >
-                  SMS ({templatesByType.SMS.length})
-                </TabsTrigger>
-                <TabsTrigger
-                  value="EMAIL"
-                  className="text-xs py-2 data-[state=active]:bg-purple-50 data-[state=active]:text-purple-700"
-                >
-                  Email ({templatesByType.EMAIL.length})
-                </TabsTrigger>
-                <TabsTrigger
-                  value="WHATSAPP"
-                  className="text-xs py-2 data-[state=active]:bg-green-50 data-[state=active]:text-green-700"
-                >
-                  WhatsApp ({templatesByType.WHATSAPP.length})
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
+    if (inSheet) {
+      return (
+        <SheetClose asChild>
+          {content}
+        </SheetClose>
+      );
+    }
+
+    return content;
+  };
+
+  const TemplateList = ({ inSheet = false }: { inSheet?: boolean }) => (
+    <div className="flex flex-col h-full min-h-0">
+      {/* Header */}
+      <div className="p-2 border-b bg-card shadow-sm">
+        <div className="flex items-center justify-between mb-0">
+          <div>
+            <h2 className="text-lg font-bold">
+              Templates
+            </h2>
           </div>
-        )}
-
-        {/* Category Filter (for templates) */}
-        {viewMode === "templates" && (
-          <div className="p-3 border-b bg-card">
-            <div className="flex items-center gap-2 mb-2">
-              <Filter className="h-3.5 w-3.5 text-gray-400" />
-              <span className="text-xs font-medium ">Category</span>
-            </div>
-            <select
-              value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value)}
-              className="w-full text-xs border rounded px-2 py-1.5 bg-card"
-            >
-              <option value="all">All Categories</option>
-              <option value="REPORT_READY">Report Ready</option>
-              <option value="DONATION_REMINDER">Donation Reminder</option>
-              <option value="THANK_YOU">Thank You</option>
-              <option value="PRIVATE_MESSAGE">Private Message</option>
-              <option value="SPONSOR">Sponsor</option>
-              <option value="NEXT_DONATION_DATE">Next Donation</option>
-              <option value="CUSTOM">Custom</option>
-            </select>
-          </div>
-        )}
-
-        {/* List */}
-        <ScrollArea className="flex-1">
-          {isLoading ? (
-            <div className="flex items-center justify-center h-full">
-              <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-            </div>
-          ) : (
-            <div className="divide-y">
-              {filteredTemplates.length === 0 ? (
-                <div className="p-8 text-center text-gray-500">
-                  <MessageSquare className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                  <p className="text-sm">No templates found</p>
-                  <p className="text-xs text-gray-400 mt-1">Create a new template to get started</p>
-                </div>
-              ) : (
-                filteredTemplates.map((template) => (
-                  <div
-                    key={template.id}
-                    onClick={() => handleTemplateSelect(template)}
-                    className={`p-3 cursor-pointer  hover:bg-card/10 transition-all border-l-2 ${selectedTemplate?.id === template.id
-                        ? "bg-primary/10 border-l-primary shadow-sm"
-                        : "border-l-transparent"
-                      }`}
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex items-center gap-2 flex-1 min-w-0">
-                        <div className={`p-1.5 rounded-md flex-shrink-0 ${getTypeColor(template.type)}`}>
-                          {getTypeIcon(template.type)}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <p className="font-semibold text-sm truncate">{template.name}</p>
-                            {template.isActive ? (
-                              <Badge variant="default" className="h-4 px-1.5 text-[10px] bg-green-500">
-                                Active
-                              </Badge>
-                            ) : (
-                              <Badge variant="secondary" className="h-4 px-1.5 text-[10px]">
-                                Inactive
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="text-xs text-gray-500 mt-0.5 capitalize">
-                            {template.category.replace(/_/g, " ").toLowerCase()}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-xs text-gray-600 line-clamp-2 mb-2 pl-8">
-                      {template.content.substring(0, 80)}...
-                    </p>
-                    <div className="flex items-center justify-between text-xs text-gray-400 pl-8">
-                      <span className="flex items-center gap-1">
-                        <Send className="h-3 w-3" />
-                        {template.usageCount}
-                      </span>
-                      {template.lastUsed && (
-                        <span className="text-[10px]">{format(new Date(template.lastUsed), "MMM dd, yyyy")}</span>
-                      )}
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          )
-          }
-        </ScrollArea>
+          <Button
+            size="sm"
+            onClick={viewMode === "templates" ? handleNewTemplate : handleNewGateway}
+            className="shadow-sm"
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            New
+          </Button>
+        </div>
       </div>
 
-      {/* Right Panel - 70% */}
-      <div className="flex-1 flex flex-col bg-card">
+      {/* Template Type Tabs */}
+      {viewMode === "templates" && (
+        <div className="border-b bg-card">
+          <Tabs value={templateTypeFilter} onValueChange={(v) => setTemplateTypeFilter(v as TemplateTypeFilter)}>
+            <TabsList className="w-full h-auto p-1 grid grid-cols-4 bg-transparent">
+              <TabsTrigger
+                value="all"
+                className="text-xs py-2 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700"
+              >
+                All ({templates.length})
+              </TabsTrigger>
+              <TabsTrigger
+                value="SMS"
+                className="text-xs py-2 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700"
+              >
+                SMS ({templatesByType.SMS.length})
+              </TabsTrigger>
+              <TabsTrigger
+                value="EMAIL"
+                className="text-xs py-2 data-[state=active]:bg-purple-50 data-[state=active]:text-purple-700"
+              >
+                Email ({templatesByType.EMAIL.length})
+              </TabsTrigger>
+              <TabsTrigger
+                value="WHATSAPP"
+                className="text-xs py-2 data-[state=active]:bg-green-50 data-[state=active]:text-green-700"
+              >
+                WhatsApp ({templatesByType.WHATSAPP.length})
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+      )}
+
+      {/* Category Filter (for templates) */}
+      {viewMode === "templates" && (
+        <div className="p-3 border-b bg-card">
+          <div className="flex items-center gap-2 mb-2">
+            <Filter className="h-3.5 w-3.5 text-gray-400" />
+            <span className="text-xs font-medium">Category</span>
+          </div>
+          <select
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value)}
+            className="w-full text-xs border rounded px-2 py-1.5 bg-card"
+          >
+            <option value="all">All Categories</option>
+            <option value="REPORT_READY">Report Ready</option>
+            <option value="DONATION_REMINDER">Donation Reminder</option>
+            <option value="THANK_YOU">Thank You</option>
+            <option value="PRIVATE_MESSAGE">Private Message</option>
+            <option value="SPONSOR">Sponsor</option>
+            <option value="NEXT_DONATION_DATE">Next Donation</option>
+            <option value="CUSTOM">Custom</option>
+          </select>
+        </div>
+      )}
+
+      {/* List */}
+      <div className="flex-1 overflow-y-auto min-h-0">
+        {isLoading ? (
+          <div className="flex items-center justify-center h-full">
+            <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+          </div>
+        ) : (
+          <div className="divide-y">
+            {filteredTemplates.length === 0 ? (
+              <div className="p-8 text-center text-gray-500">
+                <MessageSquare className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">No templates found</p>
+                <p className="text-xs text-gray-400 mt-1">Create a new template to get started</p>
+              </div>
+            ) : (
+              filteredTemplates.map((template) => (
+                <TemplateListItem key={template.id} template={template} inSheet={inSheet} />
+              ))
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="flex flex-col lg:flex-row h-auto lg:h-[calc(100vh-14vh)] min-h-[60vh] border rounded-lg bg-card shadow-lg">
+      {/* Mobile trigger for templates list */}
+      <div className="flex items-center justify-between px-3 py-2 border-b bg-card lg:hidden">
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="outline" size="sm">
+              Templates
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="right" className="w-full sm:max-w-md p-0">
+            <SheetHeader className="px-4 pt-4 pb-2 text-left border-b bg-card">
+              <SheetTitle>Templates</SheetTitle>
+            </SheetHeader>
+            <ScrollArea className="h-[80vh]">
+              <TemplateList inSheet />
+            </ScrollArea>
+          </SheetContent>
+        </Sheet>
+        <h2 className="text-base font-semibold">Notification templates</h2>
+      </div>
+
+      {/* Left Sidebar - desktop only */}
+      <div className="hidden lg:flex lg:w-[30%] border-r flex-col min-w-0">
+        <TemplateList />
+      </div>
+
+      {/* Right Panel - 70% (full width on small screens) */}
+      <div className="w-full lg:flex-1 flex flex-col bg-card min-w-0 overflow-y-auto overflow-x-auto lg:overflow-x-hidden">
         <TemplateEditor
           template={selectedTemplate}
           onSave={loadData}

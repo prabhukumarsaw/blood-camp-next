@@ -37,6 +37,14 @@ export default async function OverViewLayout({
   const result = await getDashboardOverviewStats();
   const stats = result.stats;
 
+  // Dummy blood-related stats (replace with real data in the future)
+  const dummyBloodStats = {
+    totalBloodRequests: 128,
+    fulfilledRequests: 96,
+    upcomingCamps: 4,
+    totalDonations: 312
+  };
+
   return (
     <PageContainer>
       <div className='flex flex-1 flex-col space-y-2'>
@@ -46,7 +54,7 @@ export default async function OverViewLayout({
           </h2>
         </div>
 
-        <div className='*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs md:grid-cols-2'>
+        <div className='*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs md:grid-cols-2 lg:grid-cols-4'>
           {/* Card 1: Today's Unique Visits */}
           <Card className='@container/card'>
             <CardHeader>
@@ -95,15 +103,54 @@ export default async function OverViewLayout({
               </div>
             </CardFooter>
           </Card>
-        </div>
-        <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-7'>
-          <div className='col-span-4'>{bar_stats}</div>
-          <div className='col-span-4 md:col-span-3'>
-            {/* sales arallel routes */}
-            {sales}
-          </div>
-          <div className='col-span-4'>{area_stats}</div>
-          <div className='col-span-4 md:col-span-3'>{pie_stats}</div>
+
+          {/* Card 3: Total Blood Requests (Dummy) */}
+          <Card className='@container/card'>
+            <CardHeader>
+              <CardDescription>Total Blood Requests</CardDescription>
+              <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
+                {formatNumber(dummyBloodStats.totalBloodRequests)}
+              </CardTitle>
+              <CardAction>
+                <Badge variant='outline'>
+                  <IconTrendingUp />
+                  Dummy data
+                </Badge>
+              </CardAction>
+            </CardHeader>
+            <CardFooter className='flex-col items-start gap-1.5 text-sm'>
+              <div className='line-clamp-1 flex gap-2 font-medium'>
+                Incoming blood requests overview
+              </div>
+              <div className='text-muted-foreground'>
+                Replace with real blood request stats later
+              </div>
+            </CardFooter>
+          </Card>
+
+          {/* Card 4: Upcoming Blood Camps (Dummy) */}
+          <Card className='@container/card'>
+            <CardHeader>
+              <CardDescription>Upcoming Blood Camps</CardDescription>
+              <CardTitle className='text-2xl font-semibold tabular-nums @[250px]/card:text-3xl'>
+                {formatNumber(dummyBloodStats.upcomingCamps)}
+              </CardTitle>
+              <CardAction>
+                <Badge variant='outline'>
+                  <IconTrendingUp />
+                  Dummy data
+                </Badge>
+              </CardAction>
+            </CardHeader>
+            <CardFooter className='flex-col items-start gap-1.5 text-sm'>
+              <div className='line-clamp-1 flex gap-2 font-medium'>
+                Scheduled blood donation camps
+              </div>
+              <div className='text-muted-foreground'>
+                Hook this up to real camp scheduling data later
+              </div>
+            </CardFooter>
+          </Card>
         </div>
       </div>
     </PageContainer>

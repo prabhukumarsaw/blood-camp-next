@@ -176,9 +176,9 @@ export function GatewayConfig({ gateway, onSave }: GatewayConfigProps) {
   }
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-b from-gray-50/30 to-white">
+    <div className="flex flex-col h-full bg-gradient-to-b from-gray-50/30 to-white overflow-hidden">
       {/* Header */}
-      <div className="p-6 border-b bg-white shadow-sm">
+      <div className="px-4 py-4 sm:px-6 sm:py-6 border-b bg-white shadow-sm">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">
@@ -222,8 +222,8 @@ export function GatewayConfig({ gateway, onSave }: GatewayConfigProps) {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-auto p-6">
-        <div className="max-w-4xl mx-auto space-y-6">
+      <div className="flex-1 overflow-auto px-4 py-4 sm:px-6 sm:py-6">
+        <div className="w-full max-w-4xl mx-auto space-y-6">
           {/* Basic Info */}
           <Card>
             <CardHeader>

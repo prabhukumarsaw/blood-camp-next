@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "next start && pnpm run generate",
     "lint": "eslint",
     "import": "tsx scripts/migrate-simple.ts",
     "migrate:mysql": "tsx scripts/migrate-mysql-to-postgres.ts",

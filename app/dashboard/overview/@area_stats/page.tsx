@@ -1,8 +1,5 @@
-import { AreaGraph } from '@/features/overview/components/area-graph';
-import { getNewsViewsByDeviceType } from '@/lib/actions/chart-data';
-
 export default async function AreaStats() {
-  const result = await getNewsViewsByDeviceType(30);
-  
-  return <AreaGraph data={result.data || []} total={result.total || 0} />;
+  // News views by device area statistics have been removed.
+  // This slot is kept for layout compatibility but intentionally renders nothing.
+  return null;
 }
