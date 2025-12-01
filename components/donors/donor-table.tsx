@@ -17,6 +17,7 @@ import { DateRange } from "react-day-picker";
 import { BloodGroup, DonorStatus } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { DonorCertificate } from "./donor-certificate";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface Donor {
   id: string;
@@ -65,6 +66,7 @@ export function DonorTable({ donors, total, page, totalPages, searchParams }: Do
   const [bloodGroup, setBloodGroup] = useState(searchParams.bloodGroup || "all");
   const [status, setStatus] = useState(searchParams.status || "all");
   const [isExporting, setIsExporting] = useState(false);
+  const [exportCurrentPageOnly, setExportCurrentPageOnly] = useState(false);
   const [dateRange, setDateRange] = useState<DateRange | undefined>(
     searchParams.startDate && searchParams.endDate
       ? {
@@ -125,8 +127,10 @@ export function DonorTable({ donors, total, page, totalPages, searchParams }: Do
     try {
       // Build export parameters matching the server action schema
       const exportParams: any = {
-        page: 1,
-        pageSize: 10000, // Get all data for export
+        // If "current page only" is checked, respect the current page & page size.
+        // Otherwise, request a large page size to export all matching donors.
+        page: exportCurrentPageOnly ? page : 1,
+        pageSize: exportCurrentPageOnly ? donors.length || 10 : 10000,
       };
 
       if (search) exportParams.search = search;
@@ -258,7 +262,16 @@ export function DonorTable({ donors, total, page, totalPages, searchParams }: Do
       <div className="p-3 sm:p-4 space-y-3 sm:space-y-4">
         {/* Header with Export */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <h2 className="text-lg sm:text-xl font-semibold">Donor List</h2>
+          <div className="space-y-1">
+            <h2 className="text-lg sm:text-xl font-semibold">Donor List</h2>
+            <label className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+              <Checkbox
+                checked={exportCurrentPageOnly}
+                onCheckedChange={(checked) => setExportCurrentPageOnly(!!checked)}
+              />
+              <span>Export only current page (unchecked = export all filtered donors)</span>
+            </label>
+          </div>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"

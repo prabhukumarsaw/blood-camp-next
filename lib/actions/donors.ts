@@ -53,7 +53,9 @@ const updateDonorSchema = createDonorSchema.extend({
 
 const getDonorsSchema = z.object({
   page: z.number().int().positive().default(1),
-  pageSize: z.number().int().positive().max(100).default(10),
+  // Allow larger page sizes so exports (which may request many rows)
+  // don't fail validation. Hard cap at 10000 to avoid accidental abuse.
+  pageSize: z.number().int().positive().max(10_000).default(10),
   search: z.string().optional(),
   bloodGroup: z.nativeEnum(BloodGroup).optional(),
   status: z.nativeEnum(DonorStatus).optional(),
