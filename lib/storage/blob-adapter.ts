@@ -34,8 +34,17 @@ export async function promoteLocalUploadToBlob(
     return upload;
   }
 
-  // Local file absolute path, e.g. public/storage/media/...
-  const localPath = path.join(process.cwd(), "public", upload.url);
+  // Local file absolute path.
+  // - In local/self-hosted: public/storage/media/...
+  // - On Vercel:            /tmp/storage/media/...
+  const isVercel = !!process.env.VERCEL;
+  const baseRoot = isVercel
+    ? "/tmp"
+    : path.join(process.cwd(), "public");
+
+  // upload.url is like `/storage/media/uploads/file.webp`
+  const relativeUrl = upload.url.replace(/^\//, ""); // storage/media/...
+  const localPath = path.join(baseRoot, relativeUrl);
 
   const buffer = await fs.readFile(localPath);
 

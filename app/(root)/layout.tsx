@@ -9,12 +9,12 @@ export default function HomeLayout({
   children: React.ReactNode;
 }) {
   return (
-    <PageContainer scrollable={true}>
-      <div className='flex flex-1 flex-col space-y-2 -m-4 items-center'>
+    // <PageContainer scrollable={true}>
+      <div className='flex flex-1 flex-col space-y-2  items-center'>
       
         <main className='w-full max-w-none mx-auto' >{children}</main>
         {/* <Footer /> */}
       </div>
-    </PageContainer>
+    // </PageContainer>
   )
 }
