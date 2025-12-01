@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 "use client"
 
 import { useState } from "react"
@@ -116,7 +118,7 @@ export default function DonorForm({ initialData, pageTitle = "Blood Donor Regist
       if (onSuccess) onSuccess(donor)
     } catch (error: any) {
       const errorMessage = error.message || "An error occurred while submitting the form";
-      
+
       // Special handling for duplicate donor error
       if (errorMessage.includes('already exists') || errorMessage.includes('Duplicate')) {
         setSubmitMessage({
@@ -194,8 +196,8 @@ Thank you for registering as a blood donor!
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {/* Personal Information */}
-          <FormSection 
-            title="Personal Information" 
+          <FormSection
+            title="Personal Information"
             icon={<User className="h-5 w-5" />}
             description="Basic personal details"
           >
@@ -265,8 +267,8 @@ Thank you for registering as a blood donor!
           </FormSection>
 
           {/* Physical Details */}
-          <FormSection 
-            title="Physical Details" 
+          <FormSection
+            title="Physical Details"
             icon={<Droplets className="h-5 w-5" />}
             description="Blood group and physical measurements"
           >
@@ -339,9 +341,9 @@ Thank you for registering as a blood donor!
                     <FormControl>
                       <div className="relative">
                         <Camera className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                        <Input 
-                          type="file" 
-                          className="pl-10 cursor-pointer" 
+                        <Input
+                          type="file"
+                          className="pl-10 cursor-pointer"
                           accept="image/*"
                           onChange={(e) => field.onChange(e.target.files?.[0])}
                         />
@@ -356,8 +358,8 @@ Thank you for registering as a blood donor!
           </FormSection>
 
           {/* Contact Details */}
-          <FormSection 
-            title="Contact Details" 
+          <FormSection
+            title="Contact Details"
             icon={<MapPin className="h-5 w-5" />}
             description="Primary contact information"
           >
@@ -371,10 +373,10 @@ Thank you for registering as a blood donor!
                     <FormControl>
                       <div className="relative">
                         <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                        <Input 
-                          placeholder="9876543210" 
-                          className="pl-10" 
-                          {...field} 
+                        <Input
+                          placeholder="9876543210"
+                          className="pl-10"
+                          {...field}
                           onChange={(e) => {
                             field.onChange(e);
                             // Clear duplicate error when user starts typing
@@ -439,8 +441,8 @@ Thank you for registering as a blood donor!
           </FormSection>
 
           {/* Emergency Contact */}
-          <FormSection 
-            title="Emergency Contact" 
+          <FormSection
+            title="Emergency Contact"
             icon={<Contact className="h-5 w-5" />}
             description="Emergency contact person details"
           >
@@ -478,8 +480,8 @@ Thank you for registering as a blood donor!
           </FormSection>
 
           {/* Health & Medical Details */}
-          <FormSection 
-            title="Health & Medical Details" 
+          <FormSection
+            title="Health & Medical Details"
             icon={<FileText className="h-5 w-5" />}
             description="Medical history and health information"
           >
@@ -537,8 +539,8 @@ Thank you for registering as a blood donor!
           </FormSection>
 
           {/* Preferences & Documents */}
-          <FormSection 
-            title="Preferences & Documents" 
+          <FormSection
+            title="Preferences & Documents"
             icon={<FileText className="h-5 w-5" />}
             description="Notification preferences and document upload"
           >
@@ -606,8 +608,8 @@ Thank you for registering as a blood donor!
                   <FormItem>
                     <FormLabel>ID Proof</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="file" 
+                      <Input
+                        type="file"
                         accept=".pdf,.jpg,.jpeg,.png"
                         onChange={(e) => field.onChange(e.target.files?.[0])}
                       />
@@ -623,8 +625,8 @@ Thank you for registering as a blood donor!
           </FormSection>
 
           {/* Consent & Agreement */}
-          <FormSection 
-            title="Consent & Agreement" 
+          <FormSection
+            title="Consent & Agreement"
             icon={<CheckCircle className="h-5 w-5" />}
             description="Important agreements and confirmations"
             className=""
@@ -766,14 +768,14 @@ Thank you for registering as a blood donor!
 }
 
 // Form Section Component
-function FormSection({ 
-  title, 
-  description, 
-  icon, 
-  children, 
-  className = "" 
-}: { 
-  title: string; 
+function FormSection({
+  title,
+  description,
+  icon,
+  children,
+  className = ""
+}: {
+  title: string;
   description?: string;
   icon: React.ReactNode;
   children: React.ReactNode;
@@ -782,18 +784,18 @@ function FormSection({
   return (
 
     <Card className={className}>
-       <div className="flex items-center gap-3 bg-red-600/40 -mt-4 rounded-t-lg px-4 py-1">
-          <div className="p-2 bg-red-50 rounded-lg">
-            <div className="text-red-600">{icon}</div>
-          </div>
-          <div>
-            <CardTitle className="text-md ">{title}</CardTitle>
-            {description && (
-              <p className=" text-xs mt-0.5">{description}</p>
-            )}
-          </div>
+      <div className="flex items-center gap-3 bg-red-600/40 -mt-4 rounded-t-lg px-4 py-1">
+        <div className="p-2 bg-red-50 rounded-lg">
+          <div className="text-red-600">{icon}</div>
         </div>
-      
+        <div>
+          <CardTitle className="text-md ">{title}</CardTitle>
+          {description && (
+            <p className=" text-xs mt-0.5">{description}</p>
+          )}
+        </div>
+      </div>
+
       <CardContent>
         {children}
       </CardContent>

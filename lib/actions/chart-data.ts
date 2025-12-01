@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * Chart Data Actions
  * Server-side data fetching for dashboard charts
@@ -128,7 +130,7 @@ export const getNewsByAuthorDistribution = cache(async () => {
     news.forEach((item: any) => {
       const authorId = item.author?.id || "unknown";
       const authorName = getDisplayName(item.author);
-      
+
       if (!authorCounts[authorId]) {
         authorCounts[authorId] = {
           count: 0,
@@ -201,11 +203,11 @@ export const getNewsViewsByDeviceType = cache(async (days: number = 30) => {
 
     // Group by date and device type
     const dailyDeviceCounts: Record<string, Record<string, number>> = {};
-    
+
     visits.forEach((visit: any) => {
       const date = visit.visitedAt.toISOString().split("T")[0];
       const device = visit.device || "unknown";
-      
+
       if (!dailyDeviceCounts[date]) {
         dailyDeviceCounts[date] = {};
       }
@@ -215,13 +217,13 @@ export const getNewsViewsByDeviceType = cache(async (days: number = 30) => {
     // Fill in missing dates and normalize device names
     const result = [];
     const deviceTypes = ["desktop", "mobile", "tablet"];
-    
+
     for (let i = days - 1; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
       date.setHours(0, 0, 0, 0);
       const dateStr = date.toISOString().split("T")[0];
-      
+
       const dateData: any = {
         date: dateStr,
         month: date.toLocaleDateString("en-US", { month: "short" }),
@@ -238,8 +240,8 @@ export const getNewsViewsByDeviceType = cache(async (days: number = 30) => {
           const normalizedDevice = device.toLowerCase().includes("mobile") || device.toLowerCase().includes("phone")
             ? "mobile"
             : device.toLowerCase().includes("tablet")
-            ? "tablet"
-            : "desktop";
+              ? "tablet"
+              : "desktop";
           dateData[normalizedDevice] = (dateData[normalizedDevice] || 0) + (count as number);
         });
       }

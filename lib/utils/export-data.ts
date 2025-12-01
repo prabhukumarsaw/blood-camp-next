@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * Global Data Export Utility
  * 

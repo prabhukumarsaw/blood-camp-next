@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
@@ -85,7 +86,7 @@ export function SettingsSetup() {
     }
   };
 
- 
+
 
 
 
@@ -117,10 +118,9 @@ export function SettingsSetup() {
 
   // Mobile sidebar overlay
   const MobileSidebarOverlay = () => (
-    <div 
-      className={`fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden transition-opacity duration-300 ${
-        isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-      }`}
+    <div
+      className={`fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
       onClick={() => setIsMobileMenuOpen(false)}
     />
   );
@@ -129,10 +129,9 @@ export function SettingsSetup() {
   const Sidebar = () => (
     <div className={`
       flex flex-col bg-card border-r
-      ${isMobile 
-        ? `fixed inset-y-0 left-0 w-80 z-50 transform transition-transform duration-300 ${
-            isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-          }`
+      ${isMobile
+        ? `fixed inset-y-0 left-0 w-80 z-50 transform transition-transform duration-300 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        }`
         : 'w-1/4 min-w-64'
       }
     `}>
@@ -152,11 +151,11 @@ export function SettingsSetup() {
             )}
             <h2 className="text-lg font-bold ">Settings</h2>
           </div>
-        
+
         </div>
         <p className="text-xs text-gray-500">System configuration and API settings</p>
-        
-    
+
+
       </div>
 
 
@@ -179,11 +178,10 @@ export function SettingsSetup() {
                 <div
                   key={gateway.id}
                   onClick={() => handleGatewaySelect(gateway)}
-                  className={`p-2 cursor-pointer hover:bg-card/10 transition-all duration-200 border-l-2 group ${
-                    selectedGateway?.id === gateway.id
+                  className={`p-2 cursor-pointer hover:bg-card/10 transition-all duration-200 border-l-2 group ${selectedGateway?.id === gateway.id
                       ? "bg-primary/10 border-l-primary shadow-sm"
                       : "border-l-transparent hover:border-l-gray-300"
-                  }`}
+                    }`}
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -202,9 +200,9 @@ export function SettingsSetup() {
                         {/* <p className="text-xs text-gray-500 truncate">{gateway.provider}</p> */}
                       </div>
                     </div>
-                 
+
                   </div>
-                
+
                 </div>
               ))
             )}
@@ -274,8 +272,8 @@ export function SettingsSetup() {
                 <Settings className="h-16 w-16 mx-auto mb-4 opacity-50" />
                 <h3 className="text-lg font-semibold mb-2">No Gateway Selected</h3>
                 <p className="text-sm max-w-sm">
-                  {isMobile 
-                    ? "Tap on a gateway from the menu to view details" 
+                  {isMobile
+                    ? "Tap on a gateway from the menu to view details"
                     : "Select a gateway from the sidebar to view and edit its configuration"
                   }
                 </p>

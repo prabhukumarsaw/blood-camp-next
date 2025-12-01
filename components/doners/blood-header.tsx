@@ -4,12 +4,12 @@ import { Badge } from "@/components/ui/badge"
 
 import { IconMapPin, IconHome, IconUser, IconFileText, IconPhone, IconMail } from "@tabler/icons-react"
 import Image from "next/image"
-import { ImageFallback } from "@/utils/imageFallback"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useState } from "react"
 import { Droplet, Edit, IdCardIcon } from "lucide-react"
 import { Button } from "../ui/button"
 import DonorForm from "@/components/doners/donor-form"
+import { ImageFallback } from "../imageFallback"
 
 export function BloodHeader({ donor, buildMediaUrl }: any) {
   const [showEditModal, setShowEditModal] = useState(false)
@@ -55,7 +55,7 @@ export function BloodHeader({ donor, buildMediaUrl }: any) {
                     <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
                       {donor.fullName || "N/A"}
                     </h1>
-                   
+
                   </div>
                   <Button
                     variant="ghost"
@@ -124,7 +124,7 @@ export function BloodHeader({ donor, buildMediaUrl }: any) {
                         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Gender</p>
                         <p className="text-sm font-semibold text-foreground truncate">{donor.gender}</p>
                       </div>
-                    </div>  
+                    </div>
                   )}
                 </div>
               </div>

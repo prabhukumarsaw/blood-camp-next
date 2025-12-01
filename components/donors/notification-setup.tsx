@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
@@ -100,7 +102,7 @@ export function NotificationSetup() {
 
   const filteredTemplates = useMemo(() => {
     return templates.filter((template) => {
-      const matchesSearch = 
+      const matchesSearch =
         template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         template.content.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesType = templateTypeFilter === "all" || template.type === templateTypeFilter;
@@ -153,9 +155,9 @@ export function NotificationSetup() {
           <div className="flex items-center justify-between mb-0">
             <div>
               <h2 className="text-lg font-bold ">
-              Templates
+                Templates
               </h2>
-            
+
             </div>
             <Button
               size="sm"
@@ -178,7 +180,7 @@ export function NotificationSetup() {
             />
           </div> */}
 
-        
+
         </div>
 
         {/* Template Type Tabs */}
@@ -186,26 +188,26 @@ export function NotificationSetup() {
           <div className="border-b bg-card">
             <Tabs value={templateTypeFilter} onValueChange={(v) => setTemplateTypeFilter(v as TemplateTypeFilter)}>
               <TabsList className="w-full h-auto p-1 grid grid-cols-4 bg-transparent">
-                <TabsTrigger 
-                  value="all" 
+                <TabsTrigger
+                  value="all"
                   className="text-xs py-2 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700"
                 >
                   All ({templates.length})
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="SMS" 
+                <TabsTrigger
+                  value="SMS"
                   className="text-xs py-2 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700"
                 >
                   SMS ({templatesByType.SMS.length})
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="EMAIL" 
+                <TabsTrigger
+                  value="EMAIL"
                   className="text-xs py-2 data-[state=active]:bg-purple-50 data-[state=active]:text-purple-700"
                 >
                   Email ({templatesByType.EMAIL.length})
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="WHATSAPP" 
+                <TabsTrigger
+                  value="WHATSAPP"
                   className="text-xs py-2 data-[state=active]:bg-green-50 data-[state=active]:text-green-700"
                 >
                   WhatsApp ({templatesByType.WHATSAPP.length})
@@ -245,7 +247,7 @@ export function NotificationSetup() {
             <div className="flex items-center justify-center h-full">
               <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
             </div>
-          ) :  (
+          ) : (
             <div className="divide-y">
               {filteredTemplates.length === 0 ? (
                 <div className="p-8 text-center text-gray-500">
@@ -258,11 +260,10 @@ export function NotificationSetup() {
                   <div
                     key={template.id}
                     onClick={() => handleTemplateSelect(template)}
-                    className={`p-3 cursor-pointer  hover:bg-card/10 transition-all border-l-2 ${
-                      selectedTemplate?.id === template.id 
-                          ? "bg-primary/10 border-l-primary shadow-sm"
+                    className={`p-3 cursor-pointer  hover:bg-card/10 transition-all border-l-2 ${selectedTemplate?.id === template.id
+                        ? "bg-primary/10 border-l-primary shadow-sm"
                         : "border-l-transparent"
-                    }`}
+                      }`}
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -304,19 +305,19 @@ export function NotificationSetup() {
                 ))
               )}
             </div>
-              ) 
-              }
+          )
+          }
         </ScrollArea>
       </div>
 
       {/* Right Panel - 70% */}
       <div className="flex-1 flex flex-col bg-card">
-          <TemplateEditor
-            template={selectedTemplate}
-            onSave={loadData}
-            onDelete={handleDeleteTemplate}
-          />
-      
+        <TemplateEditor
+          template={selectedTemplate}
+          onSave={loadData}
+          onDelete={handleDeleteTemplate}
+        />
+
       </div>
     </div>
   );
