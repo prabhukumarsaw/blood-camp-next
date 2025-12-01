@@ -49,10 +49,20 @@ function generateUniqueFilename(originalName: string): string {
 
 /**
  * Ensure storage directory exists
+ *
+ * NOTE:
+ * - In local/self-hosted environments we write under `<project>/storage/reports`.
+ * - On Vercel (serverless, read-only code filesystem) we instead write under
+ *   `/tmp/storage/reports`, which is the only writable area.
+ *   These files are ephemeral and primarily used as backing storage for reports.
  */
 async function ensureStorageDir(subdir?: string): Promise<string> {
-  const baseDir = path.join(process.cwd(), STORAGE_DIR);
+  const isVercel = !!process.env.VERCEL;
+
+  const baseRoot = isVercel ? "/tmp" : process.cwd();
+  const baseDir = path.join(baseRoot, STORAGE_DIR);
   const targetDir = subdir ? path.join(baseDir, subdir) : baseDir;
+
   await fs.mkdir(targetDir, { recursive: true });
   return targetDir;
 }
@@ -136,7 +146,9 @@ export async function deletePDFFromStorage(fileUrl: string): Promise<void> {
   try {
     // Remove /storage/reports prefix to get relative path
     const relativePath = fileUrl.replace(/^\/storage\/reports\//, "");
-    const filePath = path.join(process.cwd(), STORAGE_DIR, relativePath);
+    const isVercel = !!process.env.VERCEL;
+    const baseRoot = isVercel ? "/tmp" : process.cwd();
+    const filePath = path.join(baseRoot, STORAGE_DIR, relativePath);
     await fs.unlink(filePath);
   } catch (error) {
     // File might not exist, ignore error

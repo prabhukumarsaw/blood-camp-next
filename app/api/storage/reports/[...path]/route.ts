@@ -34,7 +34,11 @@ export async function GET(
     }
 
     // Construct full file path
-    const fullPath = path.join(process.cwd(), "storage/reports", filePath);
+    // - Local/self-hosted: <project>/storage/reports/...
+    // - Vercel:            /tmp/storage/reports/...
+    const isVercel = !!process.env.VERCEL;
+    const baseRoot = isVercel ? "/tmp" : process.cwd();
+    const fullPath = path.join(baseRoot, "storage/reports", filePath);
 
     // Check if file exists
     try {
