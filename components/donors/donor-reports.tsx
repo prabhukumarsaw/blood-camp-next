@@ -136,7 +136,7 @@ export function DonorReports({ donorId, donorName }: DonorReportsProps) {
               {reports.map((report) => (
                 <div
                   key={report.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-primary/10 transition-colors"
                 >
                   <div className="flex items-center gap-4 flex-1 min-w-0">
                     <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -181,7 +181,7 @@ export function DonorReports({ donorId, donorName }: DonorReportsProps) {
                     >
                       <Download className="h-4 w-4" />
                     </Button>
-                    <Button
+                    {/* <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => setDeleteReportId(report.id)}
@@ -189,7 +189,7 @@ export function DonorReports({ donorId, donorName }: DonorReportsProps) {
                       className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
                     >
                       <Trash2 className="h-4 w-4" />
-                    </Button>
+                    </Button> */}
                   </div>
                 </div>
               ))}

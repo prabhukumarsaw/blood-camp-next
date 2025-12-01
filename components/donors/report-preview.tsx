@@ -61,7 +61,7 @@ export function ReportPreview({ report, donorName }: ReportPreviewProps) {
       </Button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogContent className="md:max-w-6xl max-w-full max-h-[90vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <div className="flex items-center justify-between">
               <div>
@@ -95,14 +95,14 @@ export function ReportPreview({ report, donorName }: ReportPreviewProps) {
                   <Download className="h-4 w-4 mr-2" />
                   Download
                 </Button>
-                <Button
+                {/* <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setIsOpen(false)}
                   className="h-8 w-8 p-0"
                 >
                   <X className="h-4 w-4" />
-                </Button>
+                </Button> */}
               </div>
             </div>
           </DialogHeader>

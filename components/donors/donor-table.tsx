@@ -264,13 +264,13 @@ export function DonorTable({ donors, total, page, totalPages, searchParams }: Do
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="space-y-1">
             <h2 className="text-lg sm:text-xl font-semibold">Donor List</h2>
-            <label className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+            {/* <label className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
               <Checkbox
                 checked={exportCurrentPageOnly}
                 onCheckedChange={(checked) => setExportCurrentPageOnly(!!checked)}
               />
               <span>Export only current page (unchecked = export all filtered donors)</span>
-            </label>
+            </label> */}
           </div>
           <div className="flex items-center gap-2">
             <Button
