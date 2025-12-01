@@ -120,11 +120,12 @@ export function SignInViewPage() {
         <div className="z-10 mt-auto">
           <blockquote className="space-y-2">
             <p className="text-xl">
-              &ldquo;This Platform has helped me to save time and serve my
-              clients faster than ever before.&rdquo;
+              &ldquo;This blood management platform helps us coordinate donors,
+              respond to emergencies faster, and deliver safer care to every
+              patient.&rdquo;
             </p>
             <footer className="font-mono font-semibold text-sm">
-              ~ Ali Hassan
+              ~ Blood Bank Coordinator
             </footer>
           </blockquote>
         </div>
